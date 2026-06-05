@@ -603,27 +603,62 @@ const Auth = {
 /* =========================================================
    === LEADERBOARD (classifica giornaliera per gioco) ===
    ========================================================= */
+// --- Cloud store condiviso (database pubblico, visibile a tutti) ---
+const CLOUD = {
+  url: 'https://api.restful-api.dev/objects/ff8081819d82fab6019e9735ece64231',
+  online: null, // null = sconosciuto, true/false dopo il primo tentativo
+  async get() {
+    const r = await fetch(this.url, { cache: 'no-store' });
+    if (!r.ok) throw new Error('HTTP '+r.status);
+    const j = await r.json();
+    this.online = true;
+    return (j && j.data && j.data.scores) || {};
+  },
+  async put(scores) {
+    const r = await fetch(this.url, { method:'PUT', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ name:'mentepronta-leaderboard', data:{ scores } }) });
+    if (!r.ok) throw new Error('HTTP '+r.status);
+  },
+  async record(game, name, ms) {
+    let scores;
+    try { scores = await this.get(); } catch(e) { this.online = false; return false; }
+    const key = game + '|' + todayStr();
+    const list = scores[key] || [];
+    const ex = list.find(e => e.name === name);
+    if (ex) { if (ms < ex.ms) { ex.ms = ms; ex.ts = Date.now(); } } else list.push({ name, ms, ts: Date.now() });
+    scores[key] = list;
+    try { await this.put(scores); return true; } catch(e) { this.online = false; return false; }
+  }
+};
 const Leaderboard = {
-  // struttura: mp_scores = { "game|YYYY-MM-DD": [ {name, ms, ts} ] }
+  // mirror locale: mp_scores = { "game|YYYY-MM-DD": [ {name, ms, ts} ] }
   k(game) { return game + '|' + todayStr(); },
-  all(game) { const data = Store.get('mp_scores', {}); return (data[this.k(game)] || []).slice().sort((a,b)=>a.ms-b.ms); },
+  localAll(game) { const data = Store.get('mp_scores', {}); return (data[this.k(game)] || []).slice(); },
   record(game, ms) {
     if (!Auth.current || Auth.current.guest) return;
     const name = Auth.displayName();
     const data = Store.get('mp_scores', {}); const key = this.k(game);
     const list = data[key] || [];
     const existing = list.find(e => e.name === name);
-    if (existing) { if (ms < existing.ms) { existing.ms = ms; existing.ts = Date.now(); } } // tieni il miglior tempo
+    if (existing) { if (ms < existing.ms) { existing.ms = ms; existing.ts = Date.now(); } }
     else list.push({ name, ms, ts: Date.now() });
     data[key] = list; Store.set('mp_scores', data);
-  },
-  myRank(game) {
-    if (!Auth.current) return null;
-    const list = this.all(game); const name = Auth.displayName();
-    const i = list.findIndex(e => e.name === name);
-    return i < 0 ? null : { rank: i+1, total: list.length, ms: list[i].ms };
+    // scrivi anche nel database condiviso (non blocca il gioco)
+    CLOUD.record(game, name, ms);
   }
 };
+// unisce classifica cloud + locale (miglior tempo per nome) e ordina
+async function loadBoard(game) {
+  let cloud = null;
+  try { cloud = await CLOUD.get(); } catch(e) { cloud = null; }
+  const key = game + '|' + todayStr();
+  const map = new Map();
+  const add = e => { if (!e || !e.name) return; const cur = map.get(e.name); if (!cur || e.ms < cur.ms) map.set(e.name, { name:e.name, ms:e.ms, ts:e.ts }); };
+  Leaderboard.localAll(game).forEach(add);
+  if (cloud) (cloud[key] || []).forEach(add);
+  const list = [...map.values()].sort((a,b)=>a.ms-b.ms);
+  return { list, online: cloud !== null };
+}
 // giochi che registrano un tempo in classifica
 const TIMED_GAMES = { zip:'Zip', tango:'Tango', queen:'Queen', patches:'Patches', cruciverba:'Cruciverba', memoria:'Memoria' };
 function fmtClock(ms) {
@@ -733,15 +768,22 @@ function victoryModal(opts) {
       statCell(s.played,'Giocate'), statCell(winPct+'%','Vittorie'),
       statCell(s.streak,'Serie'), statCell(s.maxStreak,'Record')
     ));
-    // riga classifica (solo giochi a tempo)
+    // riga classifica (solo giochi a tempo) — legge la classifica condivisa
     if (TIMED_GAMES[opts.game] && opts.ms != null) {
-      const r = Leaderboard.myRank(opts.game);
       const line = el('div', { style:{textAlign:'center',margin:'0.8rem 0',padding:'0.7rem',background:'var(--color-surface-2)',borderRadius:'var(--radius-md)'} });
       line.append(el('div', { style:{fontWeight:'700',fontSize:'var(--fs-lg)'}, text:'⏱️ '+fmtClock(opts.ms) }));
-      if (r) line.append(el('div', { style:{fontSize:'var(--fs-sm)',color:'var(--color-text-muted)',marginTop:'2px'},
-        text:`Sei ${r.rank}° su ${r.total} nella classifica di oggi` }));
-      else if (Auth.current && Auth.current.guest) line.append(el('div',{ style:{fontSize:'var(--fs-sm)',color:'var(--color-text-muted)',marginTop:'2px'}, text:'Accedi per entrare in classifica' }));
-      box.append(line);
+      const sub = el('div', { style:{fontSize:'var(--fs-sm)',color:'var(--color-text-muted)',marginTop:'2px'} });
+      if (Auth.current && Auth.current.guest) sub.textContent = 'Accedi per entrare nella classifica condivisa';
+      else sub.textContent = 'Aggiornamento classifica…';
+      line.append(sub); box.append(line);
+      if (!(Auth.current && Auth.current.guest)) {
+        const name = Auth.displayName();
+        loadBoard(opts.game).then(({list, online}) => {
+          const i = list.findIndex(e => e.name === name);
+          if (i >= 0) sub.textContent = `Sei ${i+1}° su ${list.length} nella classifica di oggi` + (online ? '' : ' (offline)');
+          else sub.textContent = online ? 'Tempo registrato in classifica!' : 'Salvato in locale (database non raggiungibile)';
+        }).catch(()=>{ sub.textContent = 'Tempo salvato in locale'; });
+      }
     }
     const cd = el('p', { style:{textAlign:'center',marginTop:'0.6rem'} },
       'Prossimo puzzle tra ', el('span', { class:'countdown', text:'00:00:00' }));
@@ -1250,12 +1292,31 @@ const Zip = {
         $(`#zipBoard .gc[data-r="${nr}"][data-c="${nc}"]`).classList.add('zip-next');
       });
     }
-    // draw svg line
+    // disegna il serpentino colorato
     const svg=$('#zipSvg'); svg.innerHTML='';
+    const u=100/size;
+    // gradiente arcobaleno (corpo del serpente)
+    const defs=makeSvg('defs',{});
+    const grad=makeSvg('linearGradient',{id:'snakeGrad',x1:'0',y1:'0',x2:'1',y2:'1'});
+    const cols=['#ef4444','#f97316','#eab308','#22c55e','#06b6d4','#3b82f6','#8b5cf6','#ec4899'];
+    cols.forEach((c,i)=>grad.append(makeSvg('stop',{offset:(i/(cols.length-1)*100)+'%','stop-color':c})));
+    defs.append(grad); svg.append(defs);
     if (s.path.length>1) {
-      const u=100/size;
       const pts=s.path.map(([r,c])=>`${c*u+u/2},${r*u+u/2}`).join(' ');
-      svg.append(makeSvg('polyline',{points:pts,fill:'none',stroke:s.over?'#f59e0b':'#7c3aed','stroke-width':u*0.42,'stroke-linecap':'round','stroke-linejoin':'round',opacity:s.over?'1':'0.85'}));
+      // contorno scuro (dà spessore da "serpente")
+      svg.append(makeSvg('polyline',{points:pts,fill:'none',stroke:'rgba(0,0,0,0.22)','stroke-width':u*0.54,'stroke-linecap':'round','stroke-linejoin':'round'}));
+      // corpo colorato
+      svg.append(makeSvg('polyline',{points:pts,fill:'none',stroke:s.over?'#f59e0b':'url(#snakeGrad)','stroke-width':u*0.40,'stroke-linecap':'round','stroke-linejoin':'round'}));
+    }
+    // testa del serpente nell'ultima casella raggiunta
+    if (s.path.length>=1) {
+      const head=s.path[s.path.length-1];
+      const hx=head[1]*u+u/2, hy=head[0]*u+u/2;
+      svg.append(makeSvg('circle',{cx:hx,cy:hy,r:u*0.27,fill:s.over?'#f59e0b':'#7c3aed',stroke:'#fff','stroke-width':u*0.05}));
+      // occhietti
+      const eo=u*0.10;
+      svg.append(makeSvg('circle',{cx:hx-eo,cy:hy-eo*0.3,r:u*0.045,fill:'#fff'}));
+      svg.append(makeSvg('circle',{cx:hx+eo,cy:hy-eo*0.3,r:u*0.045,fill:'#fff'}));
     }
   },
   checkWin() {
@@ -1827,11 +1888,12 @@ function refreshHome() {
    === CLASSIFICA (leaderboard view) ===
    ========================================================= */
 let lbCurrent = 'zip';
+let lbToken = 0;
 function renderClassifica() {
   const view = $('#view-classifica'); view.innerHTML='';
   view.append(el('div', { class:'hero' },
     el('h1', { text:'🏆 Classifica del giorno' }),
-    el('p', { text:'Chi risolve il rompicapo nel minor tempo vince. Si azzera ogni giorno.' }),
+    el('p', { text:'Condivisa con tutti i giocatori. Vince chi risolve nel minor tempo. Si azzera ogni giorno.' }),
     el('p', { class:'date', text:'Giocatore: '+ (Auth.current ? Auth.displayName() : 'non connesso') })
   ));
   if (!TIMED_GAMES[lbCurrent]) lbCurrent = 'zip';
@@ -1841,26 +1903,37 @@ function renderClassifica() {
   });
   view.append(tabs);
   const list = el('div', { class:'lb-list', id:'lbList' });
-  const entries = Leaderboard.all(lbCurrent);
-  const me = Auth.current ? Auth.displayName() : null;
-  if (!entries.length) {
-    list.append(el('div', { class:'lb-empty', text:'Nessun tempo registrato oggi per questo gioco. Sii il primo a risolverlo!' }));
-  } else {
-    const medals = ['gold','silver','bronze'];
-    entries.forEach((e,i) => {
-      const row = el('div', { class:'lb-row'+(e.name===me?' me':'') });
-      row.append(
-        el('div', { class:'lb-rank'+(i<3?' '+medals[i]:''), text: i<3 ? ['🥇','🥈','🥉'][i] : (i+1)+'°' }),
-        el('div', { class:'lb-name' }, e.name, e.name===me ? el('small',{text:'tu'}) : null),
-        el('div', { class:'lb-time', text: fmtClock(e.ms) })
-      );
-      list.append(row);
-    });
-  }
+  list.append(el('div', { class:'lb-empty', text:'Caricamento classifica condivisa…' }));
   view.append(list);
-  const cta = el('p', { style:{marginTop:'1.2rem'} },
-    el('a', { class:'card-cta', href:'#'+lbCurrent, text:'→ Gioca a '+TIMED_GAMES[lbCurrent]+' e batti il record' }));
-  view.append(cta);
+  const note = el('p', { style:{fontSize:'var(--fs-xs)',color:'var(--color-text-muted)',marginTop:'0.6rem'} });
+  view.append(note);
+  view.append(el('p', { style:{marginTop:'1rem'} },
+    el('a', { class:'card-cta', href:'#'+lbCurrent, text:'→ Gioca a '+TIMED_GAMES[lbCurrent]+' e batti il record' })));
+  // refresh button
+  const refreshBtn = el('button', { class:'chip-btn', style:{marginTop:'0.8rem'}, onclick:()=>renderClassifica(), text:'🔄 Aggiorna' });
+  view.append(refreshBtn);
+  // carica i dati (cloud + locale)
+  const my = ++lbToken; const game = lbCurrent;
+  loadBoard(game).then(({list:entries, online}) => {
+    if (my !== lbToken || lbCurrent !== game) return; // l'utente ha cambiato tab
+    list.innerHTML = '';
+    const me = Auth.current && !Auth.current.guest ? Auth.displayName() : null;
+    if (!entries.length) {
+      list.append(el('div', { class:'lb-empty', text:'Nessun tempo registrato oggi. Sii il primo a risolverlo!' }));
+    } else {
+      const medals = ['gold','silver','bronze'];
+      entries.forEach((e,i) => {
+        const row = el('div', { class:'lb-row'+(e.name===me?' me':'') });
+        row.append(
+          el('div', { class:'lb-rank'+(i<3?' '+medals[i]:''), text: i<3 ? ['🥇','🥈','🥉'][i] : (i+1)+'°' }),
+          el('div', { class:'lb-name' }, e.name, e.name===me ? el('small',{text:'tu'}) : null),
+          el('div', { class:'lb-time', text: fmtClock(e.ms) })
+        );
+        list.append(row);
+      });
+    }
+    note.textContent = online ? '🌐 Classifica condivisa online · aggiornata in tempo reale' : '⚠️ Database non raggiungibile: mostro solo i tempi salvati su questo dispositivo.';
+  });
 }
 
 /* =========================================================
