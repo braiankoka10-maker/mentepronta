@@ -753,29 +753,26 @@ const Auth = {
    ========================================================= */
 // --- Cloud store condiviso (database pubblico, visibile a tutti) ---
 const CLOUD = {
-  url: 'https://api.restful-api.dev/objects/ff8081819d82fab6019e9735ece64231',
-  online: null, // null = sconosciuto, true/false dopo il primo tentativo
-  async get() {
-    const r = await fetch(this.url, { cache: 'no-store' });
-    if (!r.ok) throw new Error('HTTP '+r.status);
+  // Firebase Realtime Database (di proprietà dell'utente — permanente)
+  fb: 'https://mentepronta-ad053-default-rtdb.europe-west1.firebasedatabase.app',
+  online: null,
+  keyUrl(game) { return this.fb + '/scores/' + encodeURIComponent(game + '|' + todayStr()) + '.json'; },
+  // legge i punteggi del giorno per un gioco
+  async getList(game) {
+    const r = await fetch(this.keyUrl(game), { cache: 'no-store' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
     const j = await r.json();
     this.online = true;
-    return (j && j.data && j.data.scores) || {};
+    return j ? Object.values(j) : []; // Firebase ritorna null se vuoto
   },
-  async put(scores) {
-    const r = await fetch(this.url, { method:'PUT', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ name:'mentepronta-leaderboard', data:{ scores } }) });
-    if (!r.ok) throw new Error('HTTP '+r.status);
-  },
+  // aggiunge un punteggio (append: niente sovrascritture, niente race condition)
   async record(game, name, ms) {
-    let scores;
-    try { scores = await this.get(); } catch(e) { this.online = false; return false; }
-    const key = game + '|' + todayStr();
-    const list = scores[key] || [];
-    const ex = list.find(e => e.name === name);
-    if (ex) { if (ms < ex.ms) { ex.ms = ms; ex.ts = Date.now(); } } else list.push({ name, ms, ts: Date.now() });
-    scores[key] = list;
-    try { await this.put(scores); return true; } catch(e) { this.online = false; return false; }
+    try {
+      const r = await fetch(this.keyUrl(game), { method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, ms, ts: Date.now() }) });
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      this.online = true; return true;
+    } catch (e) { this.online = false; return false; }
   }
 };
 const Leaderboard = {
@@ -797,15 +794,14 @@ const Leaderboard = {
 };
 // unisce classifica cloud + locale (miglior tempo per nome) e ordina
 async function loadBoard(game) {
-  let cloud = null;
-  try { cloud = await CLOUD.get(); } catch(e) { cloud = null; }
-  const key = game + '|' + todayStr();
+  let cloudList = null;
+  try { cloudList = await CLOUD.getList(game); } catch(e) { cloudList = null; }
   const map = new Map();
   const add = e => { if (!e || !e.name) return; const cur = map.get(e.name); if (!cur || e.ms < cur.ms) map.set(e.name, { name:e.name, ms:e.ms, ts:e.ts }); };
   Leaderboard.localAll(game).forEach(add);
-  if (cloud) (cloud[key] || []).forEach(add);
+  if (cloudList) cloudList.forEach(add);
   const list = [...map.values()].sort((a,b)=>a.ms-b.ms);
-  return { list, online: cloud !== null };
+  return { list, online: cloudList !== null };
 }
 // giochi che registrano un tempo in classifica
 const TIMED_GAMES = { zip:'Zip', tango:'Tango', queen:'Queen', patches:'Patches', cruciverba:'Cruciverba', memoria:'Memoria' };
