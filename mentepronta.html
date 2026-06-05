@@ -1,0 +1,1685 @@
+<!DOCTYPE html>
+<html lang="it" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<meta name="description" content="MentePronta — Allenati ogni giorno con le parole e la logica. Puzzle italiani gratuiti: Parole, Cruciverba, Zip, Tango, Queen, Patches, Memoria, Anagramma.">
+<title>MentePronta · Puzzle del giorno</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+/* ===================== DESIGN TOKENS ===================== */
+:root {
+  --color-bg: #f7f6f1;
+  --color-surface: #ffffff;
+  --color-surface-2: #f0efe9;
+  --color-border: #d4d1c8;
+  --color-text: #1a1a1a;
+  --color-text-muted: #6b6b6b;
+  --color-primary: #2563eb;
+  --color-primary-hover: #1d4ed8;
+  --color-success: #16a34a;
+  --color-error: #dc2626;
+  --color-warning: #d97706;
+  --color-gold: #eab308;
+  --color-correct: #6aaa64;
+  --color-present: #c9b458;
+  --color-absent: #787c7e;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --transition: 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  --shadow-sm: 0 1px 2px oklch(from var(--color-text) l c h / 0.06), 0 1px 3px oklch(from var(--color-text) l c h / 0.08);
+  --shadow-md: 0 4px 12px oklch(from var(--color-text) l c h / 0.08), 0 2px 4px oklch(from var(--color-text) l c h / 0.06);
+  --shadow-lg: 0 12px 32px oklch(from var(--color-text) l c h / 0.14);
+  --border-alpha: 1px solid oklch(from var(--color-text) l c h / 0.12);
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'Instrument Serif', Georgia, serif;
+  --fs-xs: clamp(11px, 0.7rem + 0.1vw, 12px);
+  --fs-sm: clamp(13px, 0.8rem + 0.1vw, 14px);
+  --fs-base: clamp(15px, 0.9rem + 0.2vw, 16px);
+  --fs-lg: clamp(18px, 1rem + 0.4vw, 20px);
+  --fs-xl: clamp(24px, 1.4rem + 1vw, 28px);
+  --fs-2xl: clamp(32px, 2rem + 2vw, 40px);
+}
+[data-theme="dark"] {
+  --color-bg: #121212;
+  --color-surface: #1e1e1e;
+  --color-surface-2: #2a2a2a;
+  --color-border: #3a3a3a;
+  --color-text: #e8e8e8;
+  --color-text-muted: #9a9a9a;
+  --color-correct: #538d4e;
+  --color-present: #b59f3b;
+  --color-absent: #3a3a3c;
+}
+/* ===================== RESET / BASE ===================== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  font-family: var(--font-body);
+  font-size: var(--fs-base);
+  line-height: 1.5;
+  color: var(--color-text);
+  background: var(--color-bg);
+  min-height: 100vh;
+  transition: background var(--transition), color var(--transition);
+  -webkit-font-smoothing: antialiased;
+}
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+:focus-visible { outline: 3px solid var(--color-primary); outline-offset: 2px; border-radius: var(--radius-sm); }
+a { color: var(--color-primary); }
+.visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+/* ===================== HEADER ===================== */
+header {
+  position: sticky; top: 0; z-index: 50;
+  background: oklch(from var(--color-surface) l c h / 0.9);
+  backdrop-filter: blur(10px);
+  border-bottom: var(--border-alpha);
+}
+.header-inner {
+  max-width: 1100px; margin: 0 auto;
+  display: flex; align-items: center; gap: 1rem;
+  padding: 0.7rem 1rem;
+}
+.logo {
+  font-family: var(--font-display);
+  font-size: var(--fs-xl); font-weight: 400;
+  letter-spacing: 0.2px; color: var(--color-text);
+  text-decoration: none; white-space: nowrap;
+}
+.logo b { color: var(--color-primary); font-weight: 400; }
+nav.tabs {
+  display: flex; gap: 0.15rem; flex: 1; overflow-x: auto;
+  scrollbar-width: none; -ms-overflow-style: none;
+}
+nav.tabs::-webkit-scrollbar { display: none; }
+nav.tabs a {
+  padding: 0.4rem 0.7rem; border-radius: var(--radius-md);
+  font-size: var(--fs-sm); font-weight: 500; color: var(--color-text-muted);
+  text-decoration: none; white-space: nowrap; transition: var(--transition);
+}
+nav.tabs a:hover { background: var(--color-surface-2); color: var(--color-text); }
+nav.tabs a.active { background: var(--color-primary); color: #fff; }
+.icon-btn {
+  display: grid; place-items: center;
+  width: 40px; height: 40px; border-radius: var(--radius-md);
+  color: var(--color-text-muted); transition: var(--transition); flex-shrink: 0;
+}
+.icon-btn:hover { background: var(--color-surface-2); color: var(--color-text); }
+
+/* ===================== LAYOUT ===================== */
+main { max-width: 1100px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+.view { display: none; animation: viewIn 0.25s ease; }
+.view.active { display: block; }
+@keyframes viewIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.game-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap; }
+.game-head h1 { font-family: var(--font-display); font-size: var(--fs-2xl); font-weight: 400; line-height: 1.1; }
+.game-head p { color: var(--color-text-muted); font-size: var(--fs-sm); margin-top: 0.2rem; max-width: 46ch; }
+.game-head .actions { display: flex; gap: 0.4rem; flex-shrink: 0; }
+.chip-btn {
+  display: inline-flex; align-items: center; gap: 0.35rem;
+  padding: 0.5rem 0.8rem; border-radius: var(--radius-md);
+  background: var(--color-surface); border: var(--border-alpha);
+  font-size: var(--fs-sm); font-weight: 500; color: var(--color-text);
+  box-shadow: var(--shadow-sm); transition: var(--transition); min-height: 40px;
+}
+.chip-btn:hover { background: var(--color-surface-2); }
+.chip-btn.toggle.on { background: var(--color-primary); color: #fff; border-color: transparent; }
+.btn-primary {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
+  padding: 0.7rem 1.2rem; border-radius: var(--radius-md);
+  background: var(--color-primary); color: #fff; font-weight: 600; font-size: var(--fs-base);
+  transition: var(--transition); min-height: 44px;
+}
+.btn-primary:hover { background: var(--color-primary-hover); }
+.btn-ghost {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
+  padding: 0.7rem 1.2rem; border-radius: var(--radius-md); border: var(--border-alpha);
+  background: var(--color-surface); color: var(--color-text); font-weight: 600; min-height: 44px;
+  transition: var(--transition);
+}
+.btn-ghost:hover { background: var(--color-surface-2); }
+
+/* ===================== HOME ===================== */
+.hero { margin-bottom: 1.8rem; }
+.hero h1 { font-family: var(--font-display); font-size: var(--fs-2xl); font-weight: 400; line-height: 1.05; }
+.hero p { color: var(--color-text-muted); margin-top: 0.3rem; font-size: var(--fs-lg); }
+.hero .date { font-size: var(--fs-sm); color: var(--color-text-muted); margin-top: 0.6rem; text-transform: capitalize; }
+.card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.9rem; }
+@media (min-width: 620px) { .card-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 900px) { .card-grid { grid-template-columns: repeat(4, 1fr); } }
+.game-card {
+  position: relative; display: flex; flex-direction: column; gap: 0.5rem;
+  background: var(--color-surface); border: var(--border-alpha);
+  border-radius: var(--radius-lg); padding: 1rem; box-shadow: var(--shadow-sm);
+  transition: var(--transition); text-decoration: none; color: inherit;
+}
+.game-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+.game-card .emoji { font-size: 1.8rem; line-height: 1; }
+.game-card h3 { font-family: var(--font-display); font-size: var(--fs-lg); font-weight: 400; }
+.game-card p { font-size: var(--fs-xs); color: var(--color-text-muted); flex: 1; line-height: 1.45; }
+.game-card .meta { display: flex; align-items: center; justify-content: space-between; gap: 0.4rem; margin-top: 0.3rem; }
+.badge { display: inline-flex; align-items: center; gap: 0.25rem; font-size: var(--fs-xs); font-weight: 600; padding: 0.2rem 0.5rem; border-radius: 999px; }
+.badge.facile { background: oklch(from var(--color-success) l c h / 0.14); color: var(--color-success); }
+.badge.medio { background: oklch(from var(--color-warning) l c h / 0.16); color: var(--color-warning); }
+.badge.difficile { background: oklch(from var(--color-error) l c h / 0.14); color: var(--color-error); }
+.badge.done { background: oklch(from var(--color-success) l c h / 0.16); color: var(--color-success); position: absolute; top: 0.7rem; right: 0.7rem; }
+.streak { font-size: var(--fs-xs); color: var(--color-text-muted); font-weight: 600; }
+.card-cta { margin-top: 0.3rem; font-size: var(--fs-sm); font-weight: 600; color: var(--color-primary); }
+
+/* ===================== WORDLE / PAROLE ===================== */
+.board-center { display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+.wordle-grid { display: grid; gap: 5px; margin: 0 auto; }
+.wordle-grid .row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; }
+.tile {
+  width: 56px; height: 56px; display: grid; place-items: center;
+  font-size: 1.7rem; font-weight: 700; text-transform: uppercase;
+  border: 2px solid var(--color-border); border-radius: var(--radius-sm);
+  color: var(--color-text); background: var(--color-surface); user-select: none;
+}
+.tile.filled { border-color: var(--color-text-muted); animation: pop 0.1s ease; }
+@keyframes pop { 0% { transform: scale(0.9); } 100% { transform: scale(1); } }
+.tile.flip { animation: flip 0.5s ease forwards; }
+@keyframes flip {
+  0% { transform: rotateX(0); }
+  50% { transform: rotateX(90deg); }
+  100% { transform: rotateX(0); }
+}
+.tile.correct { background: var(--color-correct); border-color: var(--color-correct); color: #fff; }
+.tile.present { background: var(--color-present); border-color: var(--color-present); color: #fff; }
+.tile.absent { background: var(--color-absent); border-color: var(--color-absent); color: #fff; }
+.row.shake { animation: shake 0.5s ease; }
+@keyframes shake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
+.keyboard { display: flex; flex-direction: column; gap: 6px; width: 100%; max-width: 500px; }
+.kb-row { display: flex; gap: 5px; justify-content: center; }
+.key {
+  min-width: 30px; height: 52px; flex: 1; max-width: 44px;
+  display: grid; place-items: center; border-radius: var(--radius-sm);
+  background: var(--color-surface-2); font-weight: 700; font-size: 0.85rem;
+  text-transform: uppercase; transition: var(--transition); user-select: none;
+}
+.key:hover { filter: brightness(0.95); }
+.key.wide { flex: 1.5; max-width: 66px; font-size: 0.7rem; }
+.key.correct { background: var(--color-correct); color: #fff; }
+.key.present { background: var(--color-present); color: #fff; }
+.key.absent { background: var(--color-absent); color: #fff; }
+/* color-blind patterns */
+[data-cb="on"] .tile.correct::after, [data-cb="on"] .key.correct::after { content:"●"; position:absolute; font-size:9px; transform:translate(14px,-16px); }
+[data-cb="on"] .tile.present::after, [data-cb="on"] .key.present::after { content:"▲"; position:absolute; font-size:9px; transform:translate(14px,-16px); }
+[data-cb="on"] .tile { position: relative; }
+[data-cb="on"] .key { position: relative; }
+
+/* ===================== CRUCIVERBA ===================== */
+.cw-layout { display: grid; gap: 1.5rem; grid-template-columns: 1fr; align-items: start; }
+@media (min-width: 760px) { .cw-layout { grid-template-columns: auto 1fr; } }
+.cw-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 2px; background: var(--color-text); padding: 2px; border-radius: var(--radius-sm); width: min(320px, 90vw); }
+.cw-cell { position: relative; aspect-ratio: 1; background: var(--color-surface); display: grid; place-items: center; }
+.cw-cell.block { background: var(--color-text); }
+.cw-cell input {
+  width: 100%; height: 100%; border: none; text-align: center; text-transform: uppercase;
+  font-size: clamp(1rem, 5vw, 1.5rem); font-weight: 700; background: transparent; color: var(--color-text);
+}
+.cw-cell input:focus { outline: none; }
+.cw-cell.active-word { background: oklch(from var(--color-primary) l c h / 0.18); }
+.cw-cell.active-cell { background: oklch(from var(--color-primary) l c h / 0.4); }
+.cw-cell.cw-correct input { color: var(--color-success); }
+.cw-cell.cw-wrong { background: oklch(from var(--color-error) l c h / 0.3); }
+.cw-num { position: absolute; top: 1px; left: 2px; font-size: 9px; font-weight: 700; color: var(--color-text-muted); pointer-events: none; }
+.cw-clues { display: grid; gap: 1.2rem; }
+.cw-clues h4 { font-family: var(--font-display); font-size: var(--fs-lg); margin-bottom: 0.4rem; font-weight: 400; }
+.cw-clue { padding: 0.4rem 0.6rem; border-radius: var(--radius-sm); font-size: var(--fs-sm); cursor: pointer; transition: var(--transition); display: flex; gap: 0.5rem; }
+.cw-clue:hover { background: var(--color-surface-2); }
+.cw-clue.active { background: oklch(from var(--color-primary) l c h / 0.16); font-weight: 500; }
+.cw-clue b { color: var(--color-primary); }
+
+/* ===================== GENERIC GRID GAMES ===================== */
+.grid-board { display: grid; gap: 3px; margin: 0 auto; width: min(420px, 92vw); user-select: none; touch-action: none; }
+.gc {
+  aspect-ratio: 1; display: grid; place-items: center; border-radius: var(--radius-sm);
+  background: var(--color-surface); border: var(--border-alpha); font-size: clamp(1.1rem, 6vw, 1.7rem);
+  transition: var(--transition); position: relative;
+}
+.gc.conflict { background: oklch(from var(--color-error) l c h / 0.28) !important; }
+.stat-row { display: flex; gap: 1.2rem; margin-bottom: 1rem; font-size: var(--fs-sm); color: var(--color-text-muted); }
+.stat-row b { color: var(--color-text); font-variant-numeric: tabular-nums; }
+
+/* TANGO marks */
+.tango-eq, .tango-x { position: absolute; font-size: 0.7rem; font-weight: 800; z-index: 2; background: var(--color-bg); padding: 0 2px; border-radius: 3px; }
+
+/* QUEEN */
+.queen-cell { border: 1px solid oklch(from var(--color-text) l c h / 0.25); }
+.queen-cell.bad { box-shadow: inset 0 0 0 3px var(--color-error); }
+
+/* ZIP */
+.zip-wrap { position: relative; width: min(420px, 92vw); margin: 0 auto; }
+.zip-svg { position: absolute; inset: 0; pointer-events: none; width: 100%; height: 100%; z-index: 1; }
+.zip-board { position: relative; z-index: 2; }
+.gc.zip-dot { cursor: pointer; }
+.zip-num { font-weight: 800; font-size: 1rem; }
+.gc.zip-on { background: oklch(from var(--color-primary) l c h / 0.2); }
+.gc.zip-next { outline: 3px solid oklch(from var(--color-primary) l c h / 0.5); }
+
+/* PATCHES */
+.patch-layout { display: grid; gap: 1.5rem; grid-template-columns: 1fr; align-items: start; }
+@media (min-width: 720px){ .patch-layout { grid-template-columns: auto auto; } }
+.tray { display: flex; flex-wrap: wrap; gap: 0.8rem; align-content: flex-start; max-width: 320px; }
+.piece { display: grid; gap: 2px; padding: 4px; border-radius: var(--radius-sm); cursor: grab; background: var(--color-surface-2); }
+.piece.used { opacity: 0.3; pointer-events: none; }
+.piece.sel { outline: 3px solid var(--color-primary); }
+.pcell { width: 26px; height: 26px; border-radius: 3px; }
+.pcell.empty { background: transparent; }
+
+/* ===================== MEMORIA ===================== */
+.mem-grid { display: grid; gap: 8px; margin: 0 auto; width: min(440px, 94vw); }
+.mem-card { aspect-ratio: 3/4; perspective: 600px; cursor: pointer; }
+.mem-inner { position: relative; width: 100%; height: 100%; transition: transform 0.4s; transform-style: preserve-3d; }
+.mem-card.flipped .mem-inner, .mem-card.matched .mem-inner { transform: rotateY(180deg); }
+.mem-face { position: absolute; inset: 0; backface-visibility: hidden; border-radius: var(--radius-md); display: grid; place-items: center; font-size: clamp(1.4rem, 7vw, 2rem); border: var(--border-alpha); }
+.mem-front { background: var(--color-primary); color: #fff; font-family: var(--font-display); }
+.mem-back { background: var(--color-surface); transform: rotateY(180deg); flex-direction: column; }
+.mem-card.matched .mem-back { background: oklch(from var(--color-success) l c h / 0.18); border-color: var(--color-success); }
+.mem-back small { font-size: 0.6rem; color: var(--color-text-muted); margin-top: 2px; }
+
+/* ===================== ANAGRAMMA ===================== */
+.ana-wrap { max-width: 460px; }
+.ana-slots, .ana-pool { display: flex; flex-wrap: wrap; gap: 6px; margin: 1rem 0; min-height: 56px; }
+.ana-slots { padding: 8px; border: 2px dashed var(--color-border); border-radius: var(--radius-md); }
+.ana-tile {
+  width: 46px; height: 52px; display: grid; place-items: center; border-radius: var(--radius-sm);
+  background: var(--color-surface); border: var(--border-alpha); box-shadow: var(--shadow-sm);
+  font-weight: 700; font-size: 1.3rem; text-transform: uppercase; transition: var(--transition);
+}
+.ana-tile:hover { background: var(--color-surface-2); }
+.ana-tile.placed { background: var(--color-primary); color: #fff; }
+
+/* ===================== MODAL ===================== */
+.modal-overlay {
+  position: fixed; inset: 0; background: oklch(from #000 l c h / 0.5); z-index: 100;
+  display: grid; place-items: center; padding: 1rem; opacity: 0; pointer-events: none; transition: opacity 0.2s;
+}
+.modal-overlay.open { opacity: 1; pointer-events: auto; }
+.modal {
+  background: var(--color-surface); border-radius: var(--radius-lg); padding: 1.6rem;
+  max-width: 420px; width: 100%; box-shadow: var(--shadow-lg); transform: scale(0.94);
+  transition: transform 0.25s cubic-bezier(0.16,1,0.3,1); max-height: 90vh; overflow-y: auto;
+}
+.modal-overlay.open .modal { transform: scale(1); }
+.modal h2 { font-family: var(--font-display); font-size: var(--fs-xl); font-weight: 400; margin-bottom: 0.5rem; }
+.modal p { color: var(--color-text-muted); margin-bottom: 1rem; }
+.modal .modal-close { position: absolute; }
+.modal-actions { display: flex; gap: 0.6rem; margin-top: 1.2rem; flex-wrap: wrap; }
+.modal-actions button { flex: 1; min-width: 120px; }
+.countdown { font-variant-numeric: tabular-nums; font-weight: 700; color: var(--color-primary); }
+/* stats */
+.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; text-align: center; margin: 1rem 0; }
+.stats-grid .num { font-size: var(--fs-xl); font-weight: 800; font-variant-numeric: tabular-nums; }
+.stats-grid .lbl { font-size: 10px; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.3px; }
+.dist-row { display: flex; align-items: center; gap: 0.5rem; margin: 3px 0; font-size: var(--fs-sm); }
+.dist-bar { background: var(--color-absent); color: #fff; padding: 2px 6px; border-radius: var(--radius-sm); font-weight: 700; min-width: 24px; text-align: right; }
+.dist-bar.hl { background: var(--color-correct); }
+
+/* ===================== TOAST ===================== */
+#toast {
+  position: fixed; left: 50%; bottom: 80px; transform: translateX(-50%) translateY(20px);
+  background: var(--color-text); color: var(--color-bg); padding: 0.7rem 1.2rem; border-radius: var(--radius-md);
+  font-weight: 600; font-size: var(--fs-sm); z-index: 200; opacity: 0; pointer-events: none; transition: all 0.25s; box-shadow: var(--shadow-lg);
+}
+#toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ===================== FOOTER ===================== */
+footer { text-align: center; padding: 2rem 1rem; color: var(--color-text-muted); font-size: var(--fs-sm); border-top: var(--border-alpha); margin-top: 2rem; }
+
+#confetti { position: fixed; inset: 0; pointer-events: none; z-index: 150; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
+.help-list { font-size: var(--fs-sm); color: var(--color-text-muted); line-height: 1.6; padding-left: 1.1rem; }
+.help-list li { margin-bottom: 0.3rem; }
+</style>
+</head>
+<body>
+<a href="#parole" class="visually-hidden">Salta al contenuto</a>
+<header>
+  <div class="header-inner">
+    <a href="#home" class="logo" aria-label="MentePronta home">Mente<b>Pronta</b></a>
+    <nav class="tabs" id="navTabs" aria-label="Giochi"></nav>
+    <button class="icon-btn" id="themeToggle" aria-label="Cambia tema" title="Tema chiaro/scuro">🌙</button>
+  </div>
+</header>
+
+<main id="main">
+  <!-- HOME -->
+  <section id="view-home" class="view"></section>
+  <!-- GAME VIEWS injected/managed by JS -->
+  <section id="view-parole" class="view"></section>
+  <section id="view-cruciverba" class="view"></section>
+  <section id="view-zip" class="view"></section>
+  <section id="view-tango" class="view"></section>
+  <section id="view-queen" class="view"></section>
+  <section id="view-patches" class="view"></section>
+  <section id="view-memoria" class="view"></section>
+  <section id="view-anagramma" class="view"></section>
+</main>
+
+<footer>
+  <p>MentePronta · Puzzle del giorno · <strong>Torna domani</strong></p>
+  <p style="margin-top:0.4rem;font-size:var(--fs-xs)">Allenati ogni giorno con le parole e la logica.</p>
+</footer>
+
+<div class="modal-overlay" id="modalOverlay" role="dialog" aria-modal="true">
+  <div class="modal" id="modalBox"></div>
+</div>
+<div id="toast" role="status" aria-live="polite"></div>
+<canvas id="confetti"></canvas>
+
+<script>
+"use strict";
+const App = (() => {
+/* =========================================================
+   === UTILS ===
+   ========================================================= */
+const $ = (sel, root=document) => root.querySelector(sel);
+const $$ = (sel, root=document) => [...root.querySelectorAll(sel)];
+const el = (tag, props={}, ...kids) => {
+  const n = document.createElement(tag);
+  for (const [k,v] of Object.entries(props)) {
+    if (k === 'class') n.className = v;
+    else if (k === 'html') n.innerHTML = v;
+    else if (k === 'text') n.textContent = v;
+    else if (k.startsWith('on') && typeof v === 'function') n.addEventListener(k.slice(2).toLowerCase(), v);
+    else if (k === 'style' && typeof v === 'object') Object.assign(n.style, v);
+    else if (v !== null && v !== undefined && v !== false) n.setAttribute(k, v);
+  }
+  for (const kid of kids.flat()) { if (kid != null) n.append(kid.nodeType ? kid : document.createTextNode(kid)); }
+  return n;
+};
+
+// Seeded PRNG (mulberry32)
+function mulberry32(seed) {
+  let a = seed >>> 0;
+  return function() {
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    let t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+const todayStr = () => new Date().toISOString().slice(0,10);
+const dateSeed = () => parseInt(todayStr().replace(/-/g,''), 10);
+function seededRand(salt=0) { return mulberry32(dateSeed() + salt*7919); }
+function dayOfYear() {
+  const d = new Date(); const start = new Date(d.getFullYear(),0,0);
+  return Math.floor((d - start) / 86400000);
+}
+function shuffle(arr, rnd) {
+  const a = arr.slice();
+  for (let i = a.length-1; i>0; i--) { const j = Math.floor(rnd()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+function toast(msg) {
+  const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toast._t); toast._t = setTimeout(()=>t.classList.remove('show'), 1800);
+}
+function copyText(txt) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(txt).then(()=>toast('Copiato!')).catch(()=>fallbackCopy(txt));
+  } else fallbackCopy(txt);
+}
+function fallbackCopy(txt) {
+  const ta = el('textarea', { value: txt, style: { position:'fixed', opacity:'0' }});
+  document.body.append(ta); ta.select();
+  try { document.execCommand('copy'); toast('Copiato!'); } catch(e){ toast('Copia non riuscita'); }
+  ta.remove();
+}
+
+/* =========================================================
+   === STATS (in-memory) ===
+   ========================================================= */
+const Stats = {
+  data: {},
+  get(game) {
+    if (!this.data[game]) this.data[game] = { played:0, wins:0, streak:0, maxStreak:0, dist:[0,0,0,0,0,0], doneToday:false, lastWon:false };
+    return this.data[game];
+  },
+  record(game, won, guesses=null) {
+    const s = this.get(game);
+    s.played++; s.doneToday = true; s.lastWon = won;
+    if (won) { s.wins++; s.streak++; s.maxStreak = Math.max(s.maxStreak, s.streak); if (guesses!=null && guesses>=1 && guesses<=6) s.dist[guesses-1]++; }
+    else s.streak = 0;
+  }
+};
+
+/* =========================================================
+   === COUNTDOWN TO MIDNIGHT ===
+   ========================================================= */
+let countdownTimers = [];
+function nextMidnight() { const d = new Date(); d.setHours(24,0,0,0); return d; }
+function fmtHMS(ms) {
+  if (ms < 0) ms = 0;
+  const s = Math.floor(ms/1000);
+  const hh = String(Math.floor(s/3600)).padStart(2,'0');
+  const mm = String(Math.floor(s%3600/60)).padStart(2,'0');
+  const ss = String(s%60).padStart(2,'0');
+  return `${hh}:${mm}:${ss}`;
+}
+function attachCountdown(node) {
+  const tick = () => { node.textContent = fmtHMS(nextMidnight() - Date.now()); };
+  tick(); const id = setInterval(tick, 1000); countdownTimers.push(id);
+}
+function clearCountdowns() { countdownTimers.forEach(clearInterval); countdownTimers = []; }
+
+/* =========================================================
+   === CONFETTI ===
+   ========================================================= */
+function confetti() {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const cv = $('#confetti'); const ctx = cv.getContext('2d');
+  cv.width = innerWidth; cv.height = innerHeight;
+  const colors = ['#2563eb','#16a34a','#eab308','#dc2626','#c9b458','#6aaa64'];
+  const parts = Array.from({length: 140}, () => ({
+    x: innerWidth/2, y: innerHeight/3,
+    vx: (Math.random()-0.5)*14, vy: Math.random()*-14-4,
+    s: Math.random()*7+4, c: colors[Math.floor(Math.random()*colors.length)],
+    rot: Math.random()*6, vr: (Math.random()-0.5)*0.4, life: 1
+  }));
+  let frame = 0;
+  (function anim() {
+    ctx.clearRect(0,0,cv.width,cv.height); frame++;
+    parts.forEach(p => {
+      p.vy += 0.35; p.x += p.vx; p.y += p.vy; p.rot += p.vr; p.life -= 0.008;
+      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot); ctx.globalAlpha = Math.max(0,p.life);
+      ctx.fillStyle = p.c; ctx.fillRect(-p.s/2,-p.s/2,p.s,p.s); ctx.restore();
+    });
+    if (frame < 160) requestAnimationFrame(anim); else ctx.clearRect(0,0,cv.width,cv.height);
+  })();
+}
+
+/* =========================================================
+   === MODAL ===
+   ========================================================= */
+function openModal(builder) {
+  const box = $('#modalBox'); box.innerHTML = '';
+  builder(box);
+  $('#modalOverlay').classList.add('open');
+}
+function closeModal() { $('#modalOverlay').classList.remove('open'); }
+$('#modalOverlay').addEventListener('click', e => { if (e.target.id === 'modalOverlay') closeModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+function statsModal(game, gameLabel) {
+  openModal(box => {
+    const s = Stats.get(game);
+    const winPct = s.played ? Math.round(s.wins/s.played*100) : 0;
+    box.append(
+      el('h2', { text: 'Statistiche · ' + gameLabel }),
+      el('div', { class: 'stats-grid' },
+        statCell(s.played, 'Giocate'), statCell(winPct+'%', 'Vittorie'),
+        statCell(s.streak, 'Serie'), statCell(s.maxStreak, 'Record')
+      )
+    );
+    if (game === 'parole') {
+      box.append(el('h2', { style:{fontSize:'var(--fs-lg)',marginTop:'0.5rem'}, text:'Distribuzione' }));
+      const max = Math.max(1, ...s.dist);
+      for (let i=0;i<6;i++) {
+        const w = 8 + (s.dist[i]/max)*92;
+        box.append(el('div', { class:'dist-row' },
+          el('span', { text: (i+1) }),
+          el('div', { class:'dist-bar'+(s.lastWon && Wordle.state && Wordle.state.winRow===i+1?' hl':''), style:{width:w+'%'}, text: s.dist[i] })
+        ));
+      }
+    }
+    box.append(modalFooter());
+  });
+}
+function statCell(num, lbl) { return el('div', {}, el('div', { class:'num', text:String(num) }), el('div', { class:'lbl', text:lbl })); }
+function modalFooter(extra) {
+  const f = el('div', { class:'modal-actions' });
+  if (extra) f.append(extra);
+  f.append(el('button', { class:'btn-ghost', onclick: closeModal, text:'Chiudi' }));
+  return f;
+}
+function victoryModal(opts) {
+  // opts: {title, message, game, gameLabel, guesses, shareFn}
+  confetti();
+  openModal(box => {
+    box.append(el('h2', { text: opts.title || '🎉 Complimenti!' }));
+    box.append(el('p', { text: opts.message || 'Hai risolto il puzzle del giorno!' }));
+    if (opts.extra) box.append(opts.extra);
+    const s = Stats.get(opts.game);
+    const winPct = s.played ? Math.round(s.wins/s.played*100) : 0;
+    box.append(el('div', { class:'stats-grid' },
+      statCell(s.played,'Giocate'), statCell(winPct+'%','Vittorie'),
+      statCell(s.streak,'Serie'), statCell(s.maxStreak,'Record')
+    ));
+    const cd = el('p', { style:{textAlign:'center',marginTop:'0.6rem'} },
+      'Prossimo puzzle tra ', el('span', { class:'countdown', text:'00:00:00' }));
+    attachCountdown(cd.querySelector('.countdown'));
+    box.append(cd);
+    const actions = el('div', { class:'modal-actions' });
+    if (opts.shareFn) actions.append(el('button', { class:'btn-primary', onclick: opts.shareFn, text:'📤 Condividi' }));
+    actions.append(el('button', { class:'btn-ghost', onclick: closeModal, text:'Chiudi' }));
+    box.append(actions);
+  });
+}
+function gameOverModal(opts) {
+  openModal(box => {
+    box.append(el('h2', { text: opts.title || 'Peccato!' }));
+    box.append(el('p', { html: opts.message }));
+    const cd = el('p', { style:{textAlign:'center',marginTop:'0.6rem'} },
+      'Prossimo puzzle tra ', el('span', { class:'countdown', text:'00:00:00' }));
+    attachCountdown(cd.querySelector('.countdown'));
+    box.append(cd);
+    const actions = el('div', { class:'modal-actions' });
+    if (opts.shareFn) actions.append(el('button', { class:'btn-primary', onclick: opts.shareFn, text:'📤 Condividi' }));
+    actions.append(el('button', { class:'btn-ghost', onclick: closeModal, text:'Chiudi' }));
+    box.append(actions);
+  });
+}
+function confirmModal(msg, onYes) {
+  openModal(box => {
+    box.append(el('h2', { text:'Conferma' }), el('p', { text: msg }));
+    box.append(el('div', { class:'modal-actions' },
+      el('button', { class:'btn-primary', onclick: ()=>{ closeModal(); onYes(); }, text:'Sì, procedi' }),
+      el('button', { class:'btn-ghost', onclick: closeModal, text:'Annulla' })
+    ));
+  });
+}
+function helpModal(title, items) {
+  openModal(box => {
+    box.append(el('h2', { text: title }));
+    box.append(el('ul', { class:'help-list' }, ...items.map(i => el('li', { html: i }))));
+    box.append(modalFooter());
+  });
+}
+
+/* =========================================================
+   === GAME REGISTRY ===
+   ========================================================= */
+const GAMES = [
+  { id:'parole', name:'Parole', emoji:'🔤', desc:'Indovina la parola di 5 lettere in 6 tentativi.', diff:'Medio', mod: ()=>Wordle },
+  { id:'cruciverba', name:'Cruciverba', emoji:'📰', desc:'Mini cruciverba 5×5 con definizioni italiane.', diff:'Medio', mod: ()=>Cruciverba },
+  { id:'zip', name:'Zip', emoji:'🔗', desc:'Collega i numeri in ordine senza incroci.', diff:'Difficile', mod: ()=>Zip },
+  { id:'tango', name:'Tango', emoji:'☀️', desc:'Bilancia soli e lune in ogni riga e colonna.', diff:'Medio', mod: ()=>Tango },
+  { id:'queen', name:'Queen', emoji:'♛', desc:'Una regina per riga, colonna e regione.', diff:'Difficile', mod: ()=>Queen },
+  { id:'patches', name:'Patches', emoji:'🧩', desc:'Incastra i pezzi per riempire la forma.', diff:'Medio', mod: ()=>Patches },
+  { id:'memoria', name:'Memoria', emoji:'🃏', desc:'Trova le coppie di parole italiane.', diff:'Facile', mod: ()=>Memoria },
+  { id:'anagramma', name:'Anagramma', emoji:'🔡', desc:'Riordina le lettere e trova la parola.', diff:'Facile', mod: ()=>Anagramma },
+];
+const diffClass = d => d.toLowerCase();
+const diffDot = d => ({Facile:'🟢',Medio:'🟡',Difficile:'🔴'})[d];
+
+/* =========================================================
+   === DATA: WORDLE WORD LISTS ===
+   ========================================================= */
+// Soluzioni: parole comuni italiane di 5 lettere
+const PAROLE_SOL = "abete abile abito acido acqua aereo afoso aghi agire agora albse albumi alibi altro amare amaro amica amico amore ancora anelo angy aorta apice arare arena argon aroma aride arpa arsi ascia asino aspro assai asta astio atomo attico audio aula aurea avaro avere avido avoli azoto bacio badia bagno balco balia banco barca bardo barile baita basta bava beato belva bende bere berta beta bevi bidet bimbo birra bivio bocce bolle bombo bordo borsa bosco botte bozza braccio bravo breve briga brina brodo bruco bruno bufera bugia buoni busta cacio cadere calma calza campo canna canoa canto carbo carne carpa carta carro casco caso casa cassa cauto cavia cedro cella cento cera cervo cesto chela chilo cibo cielo cifra cima cinta circo cista clima coda cofano colle colmo colpa colta conca conio copia corda corno corpo corsa corte cosca costa cozza crema crepa creta croce crudo cubo cucina culto cuneo cuoco curva dado danno dardo dato decoro delta dente desco detto dieta dimensione diga dito divo doccia dolce dollaro donna dono dorso dose dote draga drago drone dubbio duomo ebano echi eccede eco edile elica elmo elsa enzima epoca erba erede ergo erica eroe esame esca esile esito etto fabbro fache faglia falco falda fame fango fanteria farsa fasce fata fauna fava febbre felce felpa fenice ferro fetta fiaba fiala fibra fico fieno figlio filo finto fiore firma fisco fiume flora fluido foca fodera fofo foglia folla fondo fonte forma forno forte fosso fotonica fragore frana frate freno fresa fritto frutto fucile fuga fulmine fumo fungo fuoco furbo furto fuso gabbia gala gallo gamba ganascia gara garza gatto gelo gemma genere genio gesto getto ghiro giada giallo gigli gioco gioia giuria globo gnomo gobba goccia goffo gola golfo gomito gonna gorgo gotico grado grana greco greve grezzo grido grigio grotta gruppo guado guai guancia guardia guasto guazzo guida guscio idea idolo igiene incanto inferno isola istinto labbro lacca lago lama lampo lana lancia lardo larice larva latte lava lega legge legno lente lepre letto leva lima limo linea lingua lino lira lirico lisca lista litro livido lobo lode logica lombo lonza lotta lotto luce luglio luna lupo lusso macchia madre magia mago malva mancia manico mano mappa mare marmo masso matita mazza mela melo menta mente mento mercato meta metro miele migliaio mille mimo mina minatore mira mirto mista mobile moda modo mogano mola molla molo monaco mondo monte morso morte mosca mossa mosto moto mucca multa mura muro musica muta nano nasce naso nastro nave nebbia neo nero nervo neve nido ninfa noce nodo noia noma nome nono norma nota notte nubi nucleo nudo nulla numero nuora nuovo nuvola oasi oblio occhio oche oculista odio offerta oggetto olio olmo ombra onda onere onice opera ora orafo orca ordine orefice organo orgoglio orlo orma orno orso orto osare ospite osso ostia otto ottone ovale ovest ozono pacco padre paese paga pagina paglia paio pala palco palla palma palmo palo pancia panico panno papa para parco pasta patto pausa pavone peccato pece pedaggio pegno pelle pelo pena pendolo penna pepe pera perno pesca peso pesto petalo petto pezzo piaga piano pianta piatto picca pieno pietra pigna pila pillola pinna pino piombo pioppo piova pista piuma pizza poco podio poesia poggio polenta polipo polso pomo ponte pony poppa porca porta posa posta pozzo prato prece premio presa prete prezzo prima primo proa prole prosa prova prua pugno pula pulce punta punto puro quadro quaglia quercia quiete quota rabbia radice radio raffica ragno raggio rame ramo rampa rana rango rapa rasoio raspo rata razza recinto regalo reggia regina regola relax remo rena reno repto resa rete retro riccio ricco riga rima rione ripa riso ritmo riva roba robot rocca roccia rogna rombo rondine rosa roseo rospo rosso rota rotta rovo rubino ruga rullo ruota ruscello russo sabbia sacco saggio sago sala salice salma salmo salsa salto salute sandalo sangue santo sapone sarda sasso satira sauna sbaglio sbarra scacco scafo scala scalino scarpa scatola scena scheda schermo schiena scia scoglio scopa scopo scorza scuola scure scusa sdraio sedano sedia seggio segno selva seme sensale senso sentiero sera serra servo sesto seta sete sfera sfida sfilata sfogo sgabello sguardo siepe siero sigillo sigla silos sindaco sirena siringa sito slitta smalto soccorso socio soffio sogno solco soldo sole solo sonno sorso sorte sosta sotto spada spago spalla spazio specchio spia spiga spina spirito spola sponda sport sposo spuma squadra stagno stalla stampa stanza stato stella stelo stilo stiva stoffa stola stop storia stoviglie strada straccio strato strega stretto strofa stuoia subbio succo sugo suolo suono susina svago svolta tacco tagli talco tana tappo tara tarlo tarma tarpa tarsia tasca tasso tatto tavolo teca tega teglia tela telaio tema tempo tenda teoria terra teschio tesi teso testa tetto tibia tiglio tigre timone timo tino tipo tiro tizio toga tomba tonno topo torcia tordo torre torta tosse tozzo traccia trama trappola trave treno triste trofeo tromba trono troppo trota truffa tubo tunica tuono turbo turno tutore tutto udito ugola ulivo umore unghia unico unione uomo uovo urlo urna uscio usura utero vacca vago valle valore valva vampa vango vano vapore varco vaso vate vedova veglia vela veleno velo vena venti vento verbo verde verme verso vespa vetro via viale vibrazione vicolo vigna vile villa vimine vino viola virtu visione vista vita vite vivo voce voga volo volpe volta voto zaffiro zaino zampa zanna zappa zebra zecca zelo zeppa zero zinco zolla zona zoo zucca zuppa".split(/\s+/).filter(w=>w.length===5);
+// Lista di parole valide accettate come tentativo (unione con soluzioni)
+const PAROLE_EXTRA = "abaco abata abeti abici aceto acuti adagi adira adora adori afona afone afoni agile agita aiola aiole alala alani alari alata alato albae alche aldina alfa alghe alibi aliti alpha altra altre altri alzai amati amavo ameba ameno amica amici amido ammra ampio anice anodo ansia aoste apici aprii arche ardeo ardo argo armie arnia arpie arroe arsai arse arso asola aspra aspri assa astii atona atono attii avara avare avari avena avive azota baffi balla balle balli ballo balza banca bandi barre basse bassi basso batte beata beati bebop becco belli bello bende bendi berre betta bevvi bezzi biada biade bibbi bidri bilie bimbe biova bisca bisce bivii bizze blesa boati bocce boemi boidi bolle bolli bombe bonus borace bordi bossi botti braca brace branda bravi bravo brevi briga brina brioso bronco bruco bruna brune bruni bruno buchi bufale buona buoni burla busta cacao cacio caffe caino calci calda calde caldi caldo calmi calza calzi campi canne canoa canta canti capii carbo carda carde cardi carie carme carne carro carta carte casca casce casco caspo cassa cauti cauto cavia cazze cedri cefro cella celle cemento cento cenci cerco cerro cervi cesta cesti cete chele chili china chini chino chips cibao cifre cigli cinta cinti circo cista cisti clima coati cobra cocci coccodrillo coda code coesi cofano coiti colei colla colle colli collo colma colmi colmo colon colpa colpi colpo colti colto comma conca conci coni conio conta conti copia copie corno corpi corpo corso corte corti corvi corvo cosca cosce coste costo cotta cotte cotti cotto cozza craft crani creda crede credo crema creme crepa crepe cresta creta crini cripta croce croci crollo cruda crude crudi crudo cubici cubo cuche cuchi cuima cumino cuoca cuoce cuoco curai curri curva curve dadi dame dande danni dardo dati dazio debba debbo deita delta dente denti desco detta detti detto dieta diete dighe ditta dive divi divii divo doccia dogi dolce dolci donai donna donne dono dopo dorma dormo dorsi dorso dosai dosse dote doti drago drink droga droghe dubbi duchi duna dune duomo ebani ebbri ebbro echi eccoli edili edita egira elisa elmo elsa eneo enti epoca epoche erbe erica erici ermo eroe eroi esami esca esce esita esito espia esule etera etere ethos etili etti euros fabbro facci faggi faina fairo falce falci falda falde falla falle fallo falsa fango fanno farai farre farro fasci fatti fatto fauna favo febbre fecce feci felce felci fendi fenice ferri ferro festa feste fetta fette fiala fiale fiato fibbia fibra fibre fiche fichi fieno fighi figli filo fine fini finto fiori firma firme fisco fissi fitta fitti fitto fiume foca foche fodera foga foglio folla folle folli folta folto fondi fondo fonte forbice forma forme forni forno forse forte forti forza forze fossa fosse fossi fosso fotone frana frane frate frati freni freno fresa fresca frigo fritta fritte fritti fritto frusta frutta frutto fuchi fucile fughe fuga fulmine fumai fumi fumo fungo funi fuoco furbo furia furie furono fusto gabbia gala galle galli gallo gambe ganci gance gara gare garza gatte gatti gatto gelai geli gelo gelsi gemma gemme genio genti gente gesso gesti gesto getti getto ghiri ghiro giada giadi giada gigli gioca gioco gioia giova giro gita gite globi globo gnomi gobba gobbe gobbo gocce goffi goffo gola gole golfi golfo gomito gonfia gonne gorgo gotti grada grado grana grane greca greci greco gridi grido grigi grosa grosi grotta gruppi guado guidai guai guanti guasto guida guide guru gusci guscio idea idee idoli idolo igloo igiene impo inca incanto inci incio inerte infero inni inno invio iodio iota iride irisi isola isole istmo iurta labbro lacca lacche laghi lago lama lame lampo lana lance lanci lardi lardo larga large larghi larva larve lasca lasco lassi lasso latta latte lavai lave lavo leda lega leghe legna legno lemmi lemmo lemure lente lenti lenza lenze lepre leporidi lessi leste lesti letta lette letti letto leva leve levi liana liane libbra libra libri liete lieti lieto lieve liete lima lime limi limo lince linci linea linee lingua lini lino lire lirici lirico lische lisci liscio liste litro livre lobi lobo loca lochi loculo lode lodi logica lombi lonza lotta lotte lotti lotto lucci luce luci ludo lumache lumi luna lune lungi lungo luogo lupa lupe lupi lupo lurci lusco macca macchia macco madia madie madre madri maghi mago magia maglia mai maiali mais malta malte malva mamma mande mango mani mania manie mano mante manto mappa mappe marca marce marci marco mare mari marmo masse massi masso matta matte matti matto mazza mazze mela mele melo menta mente menti mento meri merlo mesta mesti mesto meta mete metri metro mezza mezze mezzi mezzo miei miele mille mimo mina mine minai mira mire mirto miste misti misto mitra mobile moda mode modi modo mogi mola mole moli mollo molo monaci mondo monte morbi morsa morse morsi morso morta morte morti morto mosca mosse mossi mosso mosti mosto mota mote moto mucca mucche multe muffa muffe mugnaio mura muri muro musa muse muschio musi muso musica mutai muti muto naia naie nani nano nardo narra nasale naso nasi nasta nava nave navi nazi neri nero nervi nervo neve nevi nido nidi ninfa ninfe nitro nivei noce noci nodi nodo noia noie noma nome nomi nonne nonni nono norce norma norme nostro nota note noti notte notti nove novi nubi nuche nuda nude nudi nudo nulla numeri numero nuora nuore nuova nuove nuovi nuovo nuvola oasi obeso obici oblio oboe oboi oche ochi odiai odio odori offra offro offerto ogiva oliai olio olive olivo olmi olmo ombre ombra onda onde onere oneri onice onici onta onte opera opere oppio orafi orafo orali orare orbe orca orche orci orco ordini orefice orfani orfano organi organo orgia orgie origano orli orlo orma orme orme orna orno orsi orso orsa orto orti osai oscar oseo ospite ossa ossea ossei osso ostia ostie otri ottico otto ottone ovale ovali ovest ovini ovino ozono pacca pacche pacco padri padre paesi paese paga paghe paghi paglie pagi pala palco pale palco palla palle palli pallo palmi palmo palo pane pani panico panni panno paolo papa papi para parco pari parla parli parlo parte parti pasce passe passi passo pasta paste paura paure pause pavone pecca pecche pecci pece pedale pedoni pelle pelli pelo peli pena pene peni penna penne pepe pepi pera pere perni perno pero perse persi perso pesca pesce pesci peso pesi pesta peste pesti pesto petti petto pezza pezze pezzi pezzo piaga piaghe piani piano piatto picca picco piede piedi piega pieghe piena piene pieni pieno pieta pietra pigne pigna pile pillole pilo pini pino pinna pinne piolo piove pira pire pirite pista piste pittore piume piuma pizza pizze placa plico poca poche pochi poco podio poema poemi poesia pofi poggi poggio poiana polare polca polca poli polipo polli pollo polo polpa polpe polso polsi polvere poma pomi pomo ponte ponti pony poppa porca porci porco porre porta porte porto posa pose post posta poste posti posto potei poti pozzi pozzo prati prato preda prede preghi premi premio prese presi preso preti presto preva prima prime primi primo proa prode prore prosa prose prova prove prua prue pugni pugno pula pulci pulce punte punta punti punto pure puri puro putti putto quadri quadro quale quali quanto quarto queste questi quete quiete quinta quinte quote quota rabbia radici radio rado raffica ragno raggi raggio rame rami rampa rampe rana rane rango rapa rape rapii rara rare rari raro rasoio raspi raspo rata rate ratto razza razze recano recinto refoli regalo reggia regie regina regno regola relax remi remo rena rendo reni reno reti rete retri retro ricca ricce ricci riccio ricco riche ridi ridiamo riga righe rima rime rioni rione ripa ripe rischio riso riti ritmi ritmo riva rive roba robot rocca rocce rogna rogne romba rombi rombo rondine rondini rosa rose roseo rospi rospo rossa rosse rossi rosso rota rote rotta rotte rotti rotto rovi rovo rozzi rubino ruga rughe rulli rullo ruota ruote russo rutto sabbia sacca sacche sacco saggi saggio sago sala sale sali salii salma salme salsa salse salto salti salute salvo sandalo sangue santi santo sapa sapone sarda sarde sarte sassi sasso satira satiri sauna sbaglio sbarra scaffale scafi scafo scala scale scalo scarpe scarpa scatola scena scene scheda schermi schiena scia scie scogli scoglio scopa scope scopo scorza scuola scuole scure scuse scusa sedani sedano sedia sedie sedi seggio segna segni segno selve selva seme semi sensi senso senza sera sere serie serra serre servi servo seste sesti sesto seta sete sfera sfere sfida sfide sfogo sfoghi sgabello sguardo siepe siepi siero sigle sigla sili silos sindaco sinodo sirena sirene sito siti slitta smalto socci socio sodi sodo soffi soffio sogni sogno solca solchi solco soldi soldo sole soli solo sonni sonno sorca sorci sorse sorsi sorso sorta sorte sorti sosta soste sotto spada spade spago spalle spalla spazi spazio spia spie spighe spiga spina spine spirito spola spole sponda sport sposa spose sposi sposo spuma squadra stadi stadio stagno stalla stampa stampe stanza stanze stati stato stelle stella stelo stili stilo stipi stiva stive stoffa stole stola stop storia storie stoviglie strada strade strato strega streghe stretti stretto strofa stuoia stupa subbio succo succhi sughi sugo suoli suolo suoni suono susine susina svago svolta svolte tacco tacchi tagli tale tali talco talea tana tane tango tappi tappo tarda tarde tardi tarli tarlo tarme tarma tarpa tasca tasche tassi tasso tatto tavoli tavolo tazza tazze teca teche tegole tega tegli teglia tela tele tema temi tempo tempi tenda tende teoria terra terre testa teste testi tetra tetri tetto tetti tibia tibie tigli tiglio tigre tigri timo timone tini tino tipi tipo tira tiro tisi titoli tizio toga toghe tomba tombe tomo tomi tonache tonni tonno topi topo torce torcia tordi tordo torre torri torsi torso torta torte tosse tossi tozzi tozzo tracce traccia trama trame trappole trappola trave travi tre treni treno triste trofei trofeo trombe tromba troni trono troppo trota trote truffa tubi tubo tufo tunica tuoni tuono turbo turca turche turchi turco turni turno tuta tute tutela tutta tutte tutti tutto udito ugole ugola ulivi ulivo umore unica unite uniti unito unghie unghia unico unioni unione uomo uomini uova uovo urli urlo urna urne usai usci uscio usura usure uteri utero vacca vacche vaghi vago valli valle valore valli valva vampa vampe vango vani vano vapore varco varchi vari varia vario vasi vaso vate vati vedi vedovi vedova veglia vela vele veli veleno velo vena vene venti vento verbi verbo verde verdi vermi verme versi verso vespa vespe vesti vetri vetro viali viale vici vicoli vicolo vidi vigna vigne vile vili ville villa vimini vimine vini vino viola virgola virtu vischi visione viste vista vita vite viti vivai vivi vivo voce voci vodka voga voghe voglia voli volo volpe volpi volta volte volti volto voti voto zaini zaino zampe zampa zanne zanna zappa zappe zebre zebra zecca zecche zelo zeppe zeppa zeri zero zinco zitti zitto zolfo zolla zolle zona zone zoo zucca zucche zuppa zuppe".split(/\s+/).filter(w=>w.length===5);
+const PAROLE_VALID = new Set([...PAROLE_SOL, ...PAROLE_EXTRA]);
+
+/* =========================================================
+   === WORDLE / PAROLE ===
+   ========================================================= */
+const Wordle = {
+  state: null,
+  kbLayout: [["q","w","e","r","t","y","u","i","o","p"],["a","s","d","f","g","h","j","k","l"],["INVIO","z","x","c","v","b","n","m","CANC"]],
+  pickWord() {
+    const rnd = seededRand(1);
+    return PAROLE_SOL[Math.floor(rnd()*PAROLE_SOL.length)].toLowerCase();
+  },
+  init() {
+    const view = $('#view-parole');
+    this.state = { answer: this.pickWord(), row:0, col:0, board:[], over:false, won:false, hard:false, winRow:0, hints:{} };
+    for (let i=0;i<6;i++) this.state.board.push(['','','','','']);
+    view.innerHTML = '';
+    view.append(
+      gameHeader('Parole', 'Indovina la parola italiana di 5 lettere in 6 tentativi.', [
+        chip('toggle','Hard','hardBtn', ()=>this.toggleHard()),
+        chip('','📊','', ()=>statsModal('parole','Parole')),
+        chip('','❔','', ()=>helpModal('Come si gioca · Parole',[
+          'Hai <b>6 tentativi</b> per indovinare la parola di 5 lettere.',
+          '🟩 <b>Verde</b>: lettera giusta al posto giusto.',
+          '🟨 <b>Giallo</b>: lettera presente ma in un\'altra posizione.',
+          '⬜ <b>Grigio</b>: lettera assente dalla parola.',
+          'In <b>Hard Mode</b> devi riutilizzare gli indizi già scoperti.'
+        ]))
+      ])
+    );
+    const center = el('div', { class:'board-center' });
+    const grid = el('div', { class:'wordle-grid', id:'wGrid', role:'grid', 'aria-label':'Griglia Parole' });
+    for (let r=0;r<6;r++) {
+      const row = el('div', { class:'row', role:'row', id:'wrow'+r });
+      for (let c=0;c<5;c++) row.append(el('div', { class:'tile', role:'gridcell', id:`wt${r}-${c}`, 'aria-label':'vuota' }));
+      grid.append(row);
+    }
+    center.append(grid);
+    const kb = el('div', { class:'keyboard', id:'wKb' });
+    this.kbLayout.forEach(rowKeys => {
+      const kr = el('div', { class:'kb-row' });
+      rowKeys.forEach(k => {
+        const wide = k.length>1;
+        kr.append(el('div', { class:'key'+(wide?' wide':''), 'data-key':k, role:'button', tabindex:'0', 'aria-label':k,
+          onclick: ()=>this.press(k), text: k==='CANC'?'⌫':k }));
+      });
+      kb.append(kr);
+    });
+    center.append(kb);
+    view.append(center);
+    this._keyHandler = (e) => { if (location.hash.replace('#','')!=='parole') return; this.physical(e); };
+    document.addEventListener('keydown', this._keyHandler);
+    if (Stats.get('parole').doneToday) { /* allow replay but stats already recorded */ }
+  },
+  destroy() { if (this._keyHandler) document.removeEventListener('keydown', this._keyHandler); },
+  toggleHard() {
+    if (this.state.row>0) { toast('Hard Mode solo a inizio partita'); return; }
+    this.state.hard = !this.state.hard;
+    $('#hardBtn').classList.toggle('on', this.state.hard);
+    toast(this.state.hard?'Hard Mode attiva':'Hard Mode disattiva');
+  },
+  physical(e) {
+    if (this.state.over) return;
+    if (e.key === 'Enter') { this.press('INVIO'); }
+    else if (e.key === 'Backspace') { this.press('CANC'); }
+    else if (/^[a-zA-Zàèéìòù]$/.test(e.key)) { this.press(e.key.toLowerCase()); }
+  },
+  press(k) {
+    const s = this.state; if (s.over) return;
+    if (k === 'CANC') {
+      if (s.col>0) { s.col--; s.board[s.row][s.col]=''; this.renderTile(s.row,s.col); }
+    } else if (k === 'INVIO') { this.submit(); }
+    else if (s.col<5 && /^[a-zàèéìòù]$/.test(k)) {
+      s.board[s.row][s.col]=k; this.renderTile(s.row,s.col); s.col++;
+    }
+  },
+  renderTile(r,c) {
+    const t = $('#wt'+r+'-'+c); const v = this.state.board[r][c];
+    t.textContent = v; t.classList.toggle('filled', !!v); t.setAttribute('aria-label', v||'vuota');
+  },
+  submit() {
+    const s = this.state;
+    if (s.col<5) { this.shake(); toast('Troppo corta'); return; }
+    const guess = s.board[s.row].join('');
+    if (!PAROLE_VALID.has(guess)) { this.shake(); toast('Parola non in elenco'); return; }
+    if (s.hard) {
+      const err = this.hardCheck(guess);
+      if (err) { this.shake(); toast(err); return; }
+    }
+    const result = this.score(guess, s.answer);
+    // update hints for hard mode
+    result.forEach((res,i)=>{ if(res==='correct') s.hints['pos'+i]=guess[i]; if(res!=='absent') s.hints['has_'+guess[i]]=true; });
+    const row = s.row;
+    result.forEach((res,i)=>{
+      const t = $('#wt'+row+'-'+i);
+      setTimeout(()=>{ t.classList.add('flip'); setTimeout(()=>{ t.classList.add(res); this.markKey(s.board[row][i],res); }, 250); }, i*180);
+    });
+    if (guess === s.answer) {
+      s.won = true; s.over = true; s.winRow = row+1;
+      setTimeout(()=>{ Stats.record('parole', true, row+1); refreshHome(); victoryModal({
+        game:'parole', message:`Hai indovinato "${s.answer.toUpperCase()}" in ${row+1} tentativ${row===0?'o':'i'}!`,
+        shareFn: ()=>this.share()
+      }); }, 5*180+400);
+    } else if (row === 5) {
+      s.over = true;
+      setTimeout(()=>{ Stats.record('parole', false); refreshHome(); gameOverModal({
+        game:'parole', message:`La soluzione era: <strong>${s.answer.toUpperCase()}</strong>`, shareFn: ()=>this.share()
+      }); }, 5*180+400);
+    } else { s.row++; s.col=0; }
+  },
+  hardCheck(guess) {
+    const s = this.state;
+    for (let i=0;i<5;i++) if (s.hints['pos'+i] && guess[i]!==s.hints['pos'+i]) return `La ${i+1}ª lettera deve essere ${s.hints['pos'+i].toUpperCase()}`;
+    for (const key in s.hints) if (key.startsWith('has_')) { const l = key.slice(4); if (!guess.includes(l)) return `Devi usare la lettera ${l.toUpperCase()}`; }
+    return null;
+  },
+  score(guess, answer) {
+    const res = Array(5).fill('absent'); const counts = {};
+    for (const ch of answer) counts[ch]=(counts[ch]||0)+1;
+    for (let i=0;i<5;i++) if (guess[i]===answer[i]) { res[i]='correct'; counts[guess[i]]--; }
+    for (let i=0;i<5;i++) if (res[i]!=='correct' && counts[guess[i]]>0) { res[i]='present'; counts[guess[i]]--; }
+    return res;
+  },
+  markKey(letter, res) {
+    const key = $(`#wKb .key[data-key="${letter}"]`); if (!key) return;
+    const rank = { correct:3, present:2, absent:1 };
+    const cur = key.classList.contains('correct')?3:key.classList.contains('present')?2:key.classList.contains('absent')?1:0;
+    if (rank[res] >= cur) { key.classList.remove('correct','present','absent'); key.classList.add(res); }
+  },
+  shake() { const row = $('#wrow'+this.state.row); row.classList.add('shake'); setTimeout(()=>row.classList.remove('shake'),500); }
+  ,share() {
+    const s = this.state;
+    const emoji = { correct:'🟩', present:'🟨', absent:'⬜' };
+    let grid = '';
+    for (let r=0; r<=(s.won?s.winRow-1:5); r++) {
+      const res = this.score(s.board[r].join(''), s.answer);
+      grid += res.map(x=>emoji[x]).join('') + '\n';
+    }
+    const n = s.won ? s.winRow : 'X';
+    copyText(`MentePronta · Parole ${todayStr()}\n${n}/6\n\n${grid}\nmentepronta`);
+  }
+};
+
+/* =========================================================
+   === DATA: CRUCIVERBA (5 puzzle) ===
+   grid: '.'=block, letters=solution. clues by number.
+   ========================================================= */
+// Quadrati di parole 5×5: ogni riga E ogni colonna è una parola italiana valida.
+// across keyed 1,6,11,16,21 (righe) · down keyed 1,2,3,4,5 (colonne).
+const CRUCIVERBA_PUZZLES = [
+  {
+    grid: ["OSARE","SILOS","ALIBI","ROBOT","ESITO"],
+    across: { 1:"Avere il coraggio di fare", 6:"Depositi a torre per il grano", 7:"Prova di essere stati altrove", 8:"Automa programmabile", 9:"Risultato finale" },
+    down: { 1:"Rischiare, azzardare", 2:"Silos per cereali (plur.)", 3:"La scusa di chi è innocente", 4:"Macchina automatica", 5:"Conseguenza, sbocco" }
+  },
+  {
+    grid: ["ROBOT","OGIVA","BIDET","OVEST","TATTO"],
+    across: { 1:"Robot, automa", 6:"Arco a sesto acuto", 7:"Sanitario del bagno", 8:"Dove tramonta il sole", 9:"Il senso delle dita" },
+    down: { 1:"Macchina che lavora da sola", 2:"Punta affusolata del missile", 3:"Si trova in bagno", 4:"Punto cardinale opposto a est", 5:"Delicatezza nei modi" }
+  },
+  {
+    grid: ["SILOS","IRISI","LINCE","OSCAR","SIERO"],
+    across: { 1:"Depositi per il grano", 6:"Fiori viola (plur.)", 7:"Felino dalla vista acuta", 8:"Statuetta del cinema", 9:"Parte liquida del sangue" },
+    down: { 1:"Torri per i cereali", 2:"Parti colorate dell'occhio", 3:"Gatto selvatico dei boschi", 4:"Premio di Hollywood", 5:"Liquido del vaccino" }
+  },
+  {
+    grid: ["ZECCA","ETHOS","CHILI","COLON","ASINO"],
+    across: { 1:"Dove si coniano le monete", 6:"Carattere morale di un popolo", 7:"Mille grammi al plurale", 8:"Tratto dell'intestino", 9:"Somaro, ciuco" },
+    down: { 1:"Parassita del cane", 2:"Spirito etico di una comunità", 3:"Unità di peso (plur.)", 4:"Segno di punteggiatura: due punti (ingl.)", 5:"Animale testardo per antonomasia" }
+  },
+  {
+    grid: ["BECCO","ETHOS","CHIPS","COPIE","OSSEA"],
+    across: { 1:"La bocca degli uccelli", 6:"Spirito morale di una comunità", 7:"Patatine fritte in sacchetto", 8:"Duplicati, riproduzioni", 9:"Relativa alle ossa (agg.)" },
+    down: { 1:"Lo usa l'uccello per beccare", 2:"Carattere etico di un gruppo", 3:"Sottili patatine croccanti", 4:"Riproduzioni di un originale", 5:"Del tessuto dello scheletro" }
+  }
+];
+
+/* =========================================================
+   === CRUCIVERBA ===
+   ========================================================= */
+const Cruciverba = {
+  state: null,
+  init() {
+    const idx = dayOfYear() % CRUCIVERBA_PUZZLES.length;
+    const puz = CRUCIVERBA_PUZZLES[idx];
+    const sol = puz.grid.map(r => r.padEnd(5,'.').slice(0,5).split(''));
+    this.state = { puz, sol, dir:'across', sel:null, start:Date.now(), over:false, numbers:{} };
+    this.computeNumbers();
+    const view = $('#view-cruciverba'); view.innerHTML='';
+    view.append(gameHeader('Cruciverba', 'Mini cruciverba 5×5. Clicca una casella, scrivi, premi Tab per cambiare direzione.', [
+      chip('','✓ Verifica','', ()=>this.check()),
+      chip('','💡 Rivela','', ()=>confirmModal('Vuoi rivelare l\'intera soluzione? La partita verrà conclusa.', ()=>this.reveal())),
+      chip('','❔','', ()=>helpModal('Come si gioca · Cruciverba',[
+        'Completa la griglia 5×5 usando le definizioni.',
+        'Clicca una casella per selezionarla; <b>Tab</b> o un secondo click cambia direzione (Orizzontale/Verticale).',
+        'Il cursore avanza da solo; <b>Backspace</b> cancella e torna indietro.',
+        'Usa <b>✓ Verifica</b> per controllare: verde = giusto, rosso = sbagliato.'
+      ]))
+    ]));
+    const stat = el('div', { class:'stat-row' }, 'Tempo: ', el('b', { id:'cwTime', text:'00:00' }));
+    view.append(stat);
+    const layout = el('div', { class:'cw-layout' });
+    const grid = el('div', { class:'cw-grid', role:'grid', 'aria-label':'Griglia cruciverba' });
+    for (let r=0;r<5;r++) for (let c=0;c<5;c++) {
+      const block = sol[r][c]==='.';
+      const cell = el('div', { class:'cw-cell'+(block?' block':''), 'data-r':r, 'data-c':c, role:'gridcell' });
+      if (!block) {
+        const num = this.state.numbers[r+'-'+c];
+        if (num) cell.append(el('span', { class:'cw-num', text:num }));
+        const inp = el('input', { maxlength:'1', 'aria-label':`riga ${r+1} colonna ${c+1}`, autocomplete:'off', inputmode:'text' });
+        inp.addEventListener('focus', ()=>this.selectCell(r,c,false));
+        inp.addEventListener('input', e=>this.onInput(r,c,e));
+        inp.addEventListener('keydown', e=>this.onKey(r,c,e));
+        inp.addEventListener('click', ()=>this.selectCell(r,c,true));
+        cell.append(inp);
+      }
+      grid.append(cell);
+    }
+    layout.append(grid);
+    const clues = el('div', { class:'cw-clues' });
+    clues.append(this.cluePanel('Orizzontale','across'), this.cluePanel('Verticale','down'));
+    layout.append(clues);
+    view.append(layout);
+    this._timer = setInterval(()=>{ if(!this.state.over){ const sec=Math.floor((Date.now()-this.state.start)/1000); $('#cwTime').textContent=`${String(Math.floor(sec/60)).padStart(2,'0')}:${String(sec%60).padStart(2,'0')}`; } },1000);
+    // select first open cell
+    for (let r=0;r<5;r++) for (let c=0;c<5;c++) if (sol[r][c]!=='.') { this.selectCell(r,c,false); return; }
+  },
+  destroy() { clearInterval(this._timer); },
+  computeNumbers() {
+    const sol = this.state.sol; let n=0;
+    for (let r=0;r<5;r++) for (let c=0;c<5;c++) {
+      if (sol[r][c]==='.') continue;
+      const startA = (c===0||sol[r][c-1]==='.') && c<4 && sol[r][c+1]!=='.';
+      const startD = (r===0||sol[r-1][c]==='.') && r<4 && sol[r+1][c]!=='.';
+      if (startA||startD) { n++; this.state.numbers[r+'-'+c]=n; }
+    }
+  },
+  cluePanel(title, dir) {
+    const p = el('div', {}); p.append(el('h4', { text:title }));
+    const clues = this.state.puz[dir];
+    for (const [num, text] of Object.entries(clues)) {
+      p.append(el('div', { class:'cw-clue', 'data-dir':dir, 'data-num':num, onclick:()=>this.gotoClue(dir,num) },
+        el('b', { text:num }), el('span', { text })));
+    }
+    return p;
+  },
+  cellInput(r,c) { return $(`.cw-cell[data-r="${r}"][data-c="${c}"] input`); },
+  selectCell(r,c,toggle) {
+    const s = this.state; if (s.sol[r][c]==='.') return;
+    if (toggle && s.sel && s.sel[0]===r && s.sel[1]===c) s.dir = s.dir==='across'?'down':'across';
+    s.sel = [r,c];
+    this.highlight();
+    const inp = this.cellInput(r,c); if (document.activeElement!==inp) inp.focus();
+  },
+  wordCells(r,c,dir) {
+    const sol = this.state.sol; const cells=[];
+    if (dir==='across') { let cc=c; while(cc>0&&sol[r][cc-1]!=='.')cc--; while(cc<5&&sol[r][cc]!=='.'){cells.push([r,cc]);cc++;} }
+    else { let rr=r; while(rr>0&&sol[rr-1][c]!=='.')rr--; while(rr<5&&sol[rr][c]!=='.'){cells.push([rr,c]);rr++;} }
+    return cells;
+  },
+  highlight() {
+    $$('.cw-cell').forEach(c=>c.classList.remove('active-word','active-cell','cw-wrong'));
+    $$('.cw-clue').forEach(c=>c.classList.remove('active'));
+    const s = this.state; if (!s.sel) return;
+    const [r,c]=s.sel;
+    this.wordCells(r,c,s.dir).forEach(([rr,cc])=>$(`.cw-cell[data-r="${rr}"][data-c="${cc}"]`).classList.add('active-word'));
+    $(`.cw-cell[data-r="${r}"][data-c="${c}"]`).classList.add('active-cell');
+    // active clue
+    const wc = this.wordCells(r,c,s.dir)[0];
+    const num = this.state.numbers[wc[0]+'-'+wc[1]];
+    const cl = $(`.cw-clue[data-dir="${s.dir}"][data-num="${num}"]`); if (cl) cl.classList.add('active');
+  },
+  onInput(r,c,e) {
+    const v = e.target.value.toUpperCase().replace(/[^A-ZÀÈÉÌÒÙ]/g,'');
+    e.target.value = v.slice(-1);
+    if (e.target.value) this.advance(r,c);
+    this.checkComplete();
+  },
+  onKey(r,c,e) {
+    const s = this.state;
+    if (e.key==='Tab') { e.preventDefault(); s.dir = s.dir==='across'?'down':'across'; this.highlight(); }
+    else if (e.key==='Backspace') {
+      if (!e.target.value) { e.preventDefault(); this.retreat(r,c); }
+    }
+    else if (e.key.startsWith('Arrow')) {
+      e.preventDefault();
+      const map={ArrowUp:[-1,0],ArrowDown:[1,0],ArrowLeft:[0,-1],ArrowRight:[0,1]};
+      let [dr,dc]=map[e.key]; let nr=r+dr,nc=c+dc;
+      while(nr>=0&&nr<5&&nc>=0&&nc<5){ if(s.sol[nr][nc]!=='.'){ this.selectCell(nr,nc,false); break; } nr+=dr;nc+=dc; }
+    }
+  },
+  advance(r,c) {
+    const cells = this.wordCells(r,c,this.state.dir);
+    const i = cells.findIndex(([rr,cc])=>rr===r&&cc===c);
+    if (i<cells.length-1) this.selectCell(cells[i+1][0],cells[i+1][1],false);
+  },
+  retreat(r,c) {
+    const cells = this.wordCells(r,c,this.state.dir);
+    const i = cells.findIndex(([rr,cc])=>rr===r&&cc===c);
+    if (i>0) { const [pr,pc]=cells[i-1]; this.cellInput(pr,pc).value=''; this.selectCell(pr,pc,false); }
+  },
+  gotoClue(dir,num) {
+    this.state.dir = dir;
+    for (const [key,n] of Object.entries(this.state.numbers)) if (n==num) { const [r,c]=key.split('-').map(Number); this.selectCell(r,c,false); return; }
+  },
+  check() {
+    const s = this.state; let allRight=true, anyFilled=false;
+    for (let r=0;r<5;r++) for (let c=0;c<5;c++) {
+      if (s.sol[r][c]==='.') continue;
+      const cellDiv = $(`.cw-cell[data-r="${r}"][data-c="${c}"]`);
+      const v = (this.cellInput(r,c).value||'').toUpperCase();
+      if (v) anyFilled=true;
+      cellDiv.classList.remove('cw-correct','cw-wrong');
+      if (v===s.sol[r][c]) cellDiv.classList.add('cw-correct');
+      else { allRight=false; if (v) { cellDiv.classList.add('cw-wrong'); setTimeout(()=>cellDiv.classList.remove('cw-wrong'),900); } }
+    }
+    if (!anyFilled) toast('Compila qualche casella');
+    else if (allRight) this.win();
+    else toast('Ci sono errori');
+  },
+  checkComplete() {
+    const s = this.state;
+    for (let r=0;r<5;r++) for (let c=0;c<5;c++) {
+      if (s.sol[r][c]==='.') continue;
+      if ((this.cellInput(r,c).value||'').toUpperCase()!==s.sol[r][c]) return;
+    }
+    this.win();
+  },
+  reveal() {
+    const s = this.state;
+    for (let r=0;r<5;r++) for (let c=0;c<5;c++) if (s.sol[r][c]!=='.') this.cellInput(r,c).value=s.sol[r][c];
+    s.over=true; clearInterval(this._timer);
+    Stats.record('cruciverba', false); refreshHome();
+    gameOverModal({ game:'cruciverba', title:'Soluzione rivelata', message:'Hai rivelato la griglia. Riprova domani!' });
+  },
+  win() {
+    const s = this.state; if (s.over) return; s.over=true; clearInterval(this._timer);
+    const sec = Math.floor((Date.now()-s.start)/1000);
+    const time = `${String(Math.floor(sec/60)).padStart(2,'0')}:${String(sec%60).padStart(2,'0')}`;
+    Stats.record('cruciverba', true); refreshHome();
+    victoryModal({ game:'cruciverba', message:`Cruciverba completato in ${time}!`, shareFn:()=>copyText(`MentePronta · Cruciverba ${todayStr()}\nRisolto in ${time} ✅\nmentepronta`) });
+  }
+};
+
+/* =========================================================
+   === DATA: ZIP (3 puzzle) — path through numbered dots ===
+   Each puzzle: size, dots {n:[r,c]}. Solution path visits all cells.
+   We provide solvable hand-made puzzles where consecutive numbers
+   are reachable. The full grid must be covered by the path.
+   ========================================================= */
+const ZIP_PUZZLES = [
+  { size:5, label:'Facile', dots:{1:[0,0],2:[0,4],3:[4,4],4:[4,0],5:[2,2]} },
+  { size:6, label:'Medio', dots:{1:[0,0],2:[0,5],3:[5,5],4:[5,0],5:[2,2],6:[3,3]} },
+  { size:6, label:'Difficile', dots:{1:[0,2],2:[2,1],3:[2,0],4:[3,4],5:[4,0],6:[5,4],7:[1,5],8:[2,3]} }
+];
+
+/* =========================================================
+   === ZIP ===
+   Player draws a path covering every cell, visiting dots in order.
+   Click/drag adjacent cells to extend path; click last to undo.
+   ========================================================= */
+const Zip = {
+  state: null,
+  init() {
+    const idx = dateSeed() % ZIP_PUZZLES.length;
+    const puz = ZIP_PUZZLES[idx];
+    const cellOf = {}; for (const [n,rc] of Object.entries(puz.dots)) cellOf[rc[0]+'-'+rc[1]]=+n;
+    this.state = { puz, cellOf, path:[], moves:0, start:Date.now(), over:false, drawing:false };
+    const view = $('#view-zip'); view.innerHTML='';
+    view.append(gameHeader('Zip', 'Traccia un percorso unico che tocca tutte le caselle passando dai numeri in ordine.', [
+      chip('','↩ Annulla','', ()=>this.undo()),
+      chip('','🔄 Reset','', ()=>this.reset()),
+      chip('','❔','', ()=>helpModal('Come si gioca · Zip',[
+        'Disegna <b>un solo percorso continuo</b> che attraversa tutte le caselle.',
+        'Devi passare per i numeri <b>in ordine</b> (1→2→3…).',
+        'Il percorso <b>non può incrociarsi</b> né saltare caselle.',
+        'Clicca o trascina su caselle adiacenti per estendere; clicca l\'ultima per annullare.'
+      ]))
+    ]));
+    view.append(el('div', { class:'stat-row' }, 'Difficoltà: ', el('b',{text:puz.label}), 'Mosse: ', el('b',{id:'zipMoves',text:'0'}), 'Tempo: ', el('b',{id:'zipTime',text:'00:00'})));
+    const wrap = el('div', { class:'zip-wrap' });
+    const svg = el('svg', { class:'zip-svg', id:'zipSvg', viewBox:'0 0 100 100', preserveAspectRatio:'none' });
+    const board = el('div', { class:'grid-board zip-board', id:'zipBoard', role:'grid', 'aria-label':'Griglia Zip', style:{ gridTemplateColumns:`repeat(${puz.size},1fr)`, width:'100%' } });
+    for (let r=0;r<puz.size;r++) for (let c=0;c<puz.size;c++) {
+      const n = cellOf[r+'-'+c];
+      const cell = el('div', { class:'gc zip-dot queen-cell', 'data-r':r, 'data-c':c, role:'gridcell', 'aria-label': n?('numero '+n):`cella ${r},${c}` });
+      if (n) cell.append(el('span', { class:'zip-num', text:n }));
+      board.append(cell);
+    }
+    wrap.append(svg, board);
+    view.append(wrap);
+    // events (pointer)
+    board.addEventListener('pointerdown', e=>{ const cell=e.target.closest('.gc'); if(!cell)return; this.state.drawing=true; this.tryAdd(+cell.dataset.r,+cell.dataset.c); });
+    board.addEventListener('pointerover', e=>{ if(!this.state.drawing)return; const cell=e.target.closest('.gc'); if(!cell)return; this.tryAdd(+cell.dataset.r,+cell.dataset.c); });
+    document.addEventListener('pointerup', this._up = ()=>{ this.state.drawing=false; });
+    this._timer = setInterval(()=>{ if(!this.state.over){ const s=Math.floor((Date.now()-this.state.start)/1000); $('#zipTime').textContent=`${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`; } },1000);
+    this.render();
+  },
+  destroy() { clearInterval(this._timer); if(this._up) document.removeEventListener('pointerup',this._up); },
+  reset() { this.state.path=[]; this.state.moves=0; this.state.over=false; this.render(); },
+  undo() { this.state.path.pop(); this.render(); },
+  adjacent(a,b){ return Math.abs(a[0]-b[0])+Math.abs(a[1]-b[1])===1; },
+  tryAdd(r,c) {
+    const s=this.state; if(s.over) return;
+    const path=s.path; const key=[r,c];
+    if (path.length===0) {
+      if (s.cellOf[r+'-'+c]===1) { path.push(key); s.moves++; this.render(); }
+      else toast('Inizia dalla casella 1');
+      return;
+    }
+    const last=path[path.length-1];
+    if (last[0]===r&&last[1]===c) return;
+    // step back
+    if (path.length>=2 && path[path.length-2][0]===r && path[path.length-2][1]===c) { path.pop(); this.render(); return; }
+    if (path.some(p=>p[0]===r&&p[1]===c)) { return; } // already visited
+    if (!this.adjacent(last,key)) return;
+    // numbered cells must be in order
+    const num = s.cellOf[r+'-'+c];
+    if (num) {
+      const visitedNums = path.map(p=>s.cellOf[p[0]+'-'+p[1]]).filter(Boolean);
+      const maxN = visitedNums.length?Math.max(...visitedNums):0;
+      if (num !== maxN+1) { toast('Devi seguire l\'ordine dei numeri'); return; }
+    }
+    path.push(key); s.moves++; this.render();
+    this.checkWin();
+  },
+  render() {
+    const s=this.state; const size=s.puz.size;
+    $('#zipMoves').textContent=s.moves;
+    $$('#zipBoard .gc').forEach(c=>{ c.classList.remove('zip-on','zip-next'); });
+    s.path.forEach(([r,c])=>$(`#zipBoard .gc[data-r="${r}"][data-c="${c}"]`).classList.add('zip-on'));
+    // valid next highlights
+    if (s.path.length>0 && !s.over) {
+      const last=s.path[s.path.length-1];
+      [[-1,0],[1,0],[0,-1],[0,1]].forEach(([dr,dc])=>{
+        const nr=last[0]+dr,nc=last[1]+dc;
+        if(nr<0||nc<0||nr>=size||nc>=size)return;
+        if(s.path.some(p=>p[0]===nr&&p[1]===nc))return;
+        const num=s.cellOf[nr+'-'+nc];
+        if(num){ const vn=s.path.map(p=>s.cellOf[p[0]+'-'+p[1]]).filter(Boolean); const mx=vn.length?Math.max(...vn):0; if(num!==mx+1)return; }
+        $(`#zipBoard .gc[data-r="${nr}"][data-c="${nc}"]`).classList.add('zip-next');
+      });
+    }
+    // draw svg line
+    const svg=$('#zipSvg'); svg.innerHTML='';
+    if (s.path.length>1) {
+      const u=100/size;
+      const pts=s.path.map(([r,c])=>`${c*u+u/2},${r*u+u/2}`).join(' ');
+      svg.append(makeSvg('polyline',{points:pts,fill:'none',stroke:s.over?'var(--color-gold)':'var(--color-primary)','stroke-width':u*0.32,'stroke-linecap':'round','stroke-linejoin':'round'}));
+    }
+  },
+  checkWin() {
+    const s=this.state; const total=s.puz.size*s.puz.size;
+    if (s.path.length!==total) return;
+    // ensure all numbers visited (they are, since coverage + order)
+    s.over=true; clearInterval(this._timer); this.render();
+    const sec=Math.floor((Date.now()-s.start)/1000);
+    const time=`${String(Math.floor(sec/60)).padStart(2,'0')}:${String(sec%60).padStart(2,'0')}`;
+    Stats.record('zip', true); refreshHome();
+    victoryModal({ game:'zip', message:`Percorso completato in ${s.moves} mosse e ${time}!`, shareFn:()=>copyText(`MentePronta · Zip ${todayStr()}\nRisolto in ${time} 🔗\nmentepronta`) });
+  }
+};
+function makeSvg(tag,attrs){ const n=document.createElementNS('http://www.w3.org/2000/svg',tag); for(const[k,v]of Object.entries(attrs))n.setAttribute(k,v); return n; }
+
+/* =========================================================
+   === DATA: TANGO (2 puzzle) ===
+   0=empty 1=sun 2=moon. given=fixed. constraints between cells.
+   ========================================================= */
+const TANGO_PUZZLES = [
+  {
+    given: [
+      [1,0,0,0,0,2],
+      [0,0,2,0,0,0],
+      [0,1,0,0,2,0],
+      [0,0,0,1,0,0],
+      [0,0,1,0,0,0],
+      [2,0,0,0,0,1]
+    ],
+    cons: [ {a:[0,1],b:[0,2],t:'='}, {a:[2,2],b:[2,3],t:'x'}, {a:[3,0],b:[4,0],t:'='}, {a:[5,2],b:[5,3],t:'x'} ]
+  },
+  {
+    given: [
+      [0,0,1,2,0,0],
+      [2,0,0,0,0,1],
+      [0,0,0,0,0,0],
+      [0,0,0,0,0,0],
+      [1,0,0,0,0,2],
+      [0,0,2,1,0,0]
+    ],
+    cons: [ {a:[2,0],b:[2,1],t:'='}, {a:[2,4],b:[2,5],t:'x'}, {a:[3,0],b:[3,1],t:'x'}, {a:[0,2],b:[1,2],t:'='} ]
+  }
+];
+
+/* =========================================================
+   === TANGO ===
+   ========================================================= */
+const Tango = {
+  state: null,
+  init() {
+    const idx = dateSeed() % TANGO_PUZZLES.length;
+    const puz = TANGO_PUZZLES[idx];
+    const board = puz.given.map(r=>r.slice());
+    this.state = { puz, board, over:false };
+    const view = $('#view-tango'); view.innerHTML='';
+    view.append(gameHeader('Tango', '3 soli e 3 lune per riga e colonna. Mai 3 uguali di fila. Rispetta = e ×.', [
+      chip('','🔄 Reset','', ()=>this.reset()),
+      chip('','❔','', ()=>helpModal('Come si gioca · Tango',[
+        'Ogni <b>riga</b> e <b>colonna</b> deve avere esattamente 3 ☀️ e 3 🌙.',
+        'Non più di <b>2 simboli uguali</b> adiacenti in orizzontale o verticale.',
+        'Le caselle unite da <b>=</b> hanno lo stesso simbolo; quelle con <b>×</b> simboli diversi.',
+        'Tocca una casella per ciclare: vuota → ☀️ → 🌙 → vuota.'
+      ]))
+    ]));
+    const sym=['','☀️','🌙'];
+    const wrap = el('div', { style:{position:'relative', width:'min(420px,92vw)', margin:'0 auto'} });
+    const grid = el('div', { class:'grid-board', id:'tangoBoard', role:'grid', 'aria-label':'Griglia Tango', style:{gridTemplateColumns:'repeat(6,1fr)', width:'100%'} });
+    for (let r=0;r<6;r++) for (let c=0;c<6;c++) {
+      const fixed = puz.given[r][c]!==0;
+      const cell = el('div', { class:'gc queen-cell', 'data-r':r, 'data-c':c, role:'gridcell', tabindex:'0',
+        'aria-label':`riga ${r+1} colonna ${c+1}`, style: fixed?{fontWeight:'700', cursor:'default', background:'var(--color-surface-2)'}:{} });
+      cell.textContent = sym[board[r][c]];
+      grid.append(cell);
+    }
+    grid.addEventListener('click', e=>{ const cell=e.target.closest('.gc'); if(cell) this.cycle(+cell.dataset.r,+cell.dataset.c); });
+    grid.addEventListener('keydown', e=>{ if(e.key===' '||e.key==='Enter'){ const cell=e.target.closest('.gc'); if(cell){e.preventDefault();this.cycle(+cell.dataset.r,+cell.dataset.c);} } });
+    wrap.append(grid);
+    view.append(wrap);
+    // constraint markers
+    this.drawConstraints(wrap, grid);
+    this.validate();
+  },
+  destroy() {},
+  reset() { const s=this.state; s.board=s.puz.given.map(r=>r.slice()); s.over=false; this.renderAll(); this.validate(); },
+  drawConstraints(wrap, grid) {
+    // place after layout
+    requestAnimationFrame(()=>{
+      this.state.puz.cons.forEach(con=>{
+        const ca=$(`#tangoBoard .gc[data-r="${con.a[0]}"][data-c="${con.a[1]}"]`);
+        const cb=$(`#tangoBoard .gc[data-r="${con.b[0]}"][data-c="${con.b[1]}"]`);
+        const ra=ca.offsetLeft+ca.offsetWidth/2, rb=cb.offsetLeft+cb.offsetWidth/2;
+        const ya=ca.offsetTop+ca.offsetHeight/2, yb=cb.offsetTop+cb.offsetHeight/2;
+        const m=el('span',{class:con.t==='='?'tango-eq':'tango-x', text:con.t==='='?'=':'×', style:{ left:((ra+rb)/2-5)+'px', top:((ya+yb)/2-8)+'px' }});
+        wrap.append(m);
+      });
+    });
+  },
+  cycle(r,c) {
+    const s=this.state; if(s.over) return; if(s.puz.given[r][c]!==0) return;
+    s.board[r][c]=(s.board[r][c]+1)%3;
+    const cell=$(`#tangoBoard .gc[data-r="${r}"][data-c="${c}"]`);
+    cell.textContent=['','☀️','🌙'][s.board[r][c]];
+    this.validate();
+  },
+  renderAll() { for(let r=0;r<6;r++)for(let c=0;c<6;c++){ $(`#tangoBoard .gc[data-r="${r}"][data-c="${c}"]`).textContent=['','☀️','🌙'][this.state.board[r][c]]; } },
+  validate() {
+    const s=this.state; const b=s.board; const conflicts=new Set();
+    const mark=(r,c)=>conflicts.add(r+'-'+c);
+    // rows/cols counts >3 and triples
+    for (let i=0;i<6;i++){
+      let rs=0,rm=0,cs=0,cm=0;
+      for(let j=0;j<6;j++){ if(b[i][j]===1)rs++;if(b[i][j]===2)rm++;if(b[j][i]===1)cs++;if(b[j][i]===2)cm++; }
+      if(rs>3||rm>3)for(let j=0;j<6;j++)mark(i,j);
+      if(cs>3||cm>3)for(let j=0;j<6;j++)mark(j,i);
+    }
+    // triples
+    for(let r=0;r<6;r++)for(let c=0;c<6;c++){
+      const v=b[r][c]; if(!v)continue;
+      if(c<=3&&b[r][c+1]===v&&b[r][c+2]===v){mark(r,c);mark(r,c+1);mark(r,c+2);}
+      if(r<=3&&b[r+1][c]===v&&b[r+2][c]===v){mark(r,c);mark(r+1,c);mark(r+2,c);}
+    }
+    // constraints
+    s.puz.cons.forEach(con=>{
+      const va=b[con.a[0]][con.a[1]], vb=b[con.b[0]][con.b[1]];
+      if(va&&vb){ if(con.t==='='&&va!==vb){mark(...con.a);mark(...con.b);} if(con.t==='x'&&va===vb){mark(...con.a);mark(...con.b);} }
+    });
+    $$('#tangoBoard .gc').forEach(c=>c.classList.toggle('conflict', conflicts.has(c.dataset.r+'-'+c.dataset.c)));
+    // win check
+    let full=true; for(let r=0;r<6;r++)for(let c=0;c<6;c++)if(!b[r][c])full=false;
+    if(full&&conflicts.size===0&&!s.over){ s.over=true; Stats.record('tango',true); refreshHome();
+      victoryModal({ game:'tango', message:'Griglia Tango in equilibrio perfetto!', shareFn:()=>copyText(`MentePronta · Tango ${todayStr()}\nRisolto ☀️🌙\nmentepronta`) }); }
+  }
+};
+
+/* =========================================================
+   === DATA: QUEEN (3 puzzle) ===
+   regions: NxN ids 0..N-1. solution implicit (one queen per region/row/col, non-touching)
+   ========================================================= */
+const QUEEN_PUZZLES = [
+  { n:6, regions:[
+    [0,0,2,1,1,1],
+    [3,3,2,2,1,1],
+    [3,3,2,2,2,1],
+    [3,3,3,2,2,1],
+    [3,3,3,3,4,4],
+    [5,5,5,5,4,4]
+  ], solution:[ [0,0],[1,5],[2,3],[3,1],[4,4],[5,2] ] },
+  { n:6, regions:[
+    [1,1,1,0,0,0],
+    [4,1,1,0,0,0],
+    [4,4,0,0,0,2],
+    [4,4,0,3,0,0],
+    [4,4,5,5,0,0],
+    [4,5,5,5,5,0]
+  ], solution:[ [0,4],[1,1],[2,5],[3,3],[4,0],[5,2] ] },
+  { n:7, regions:[
+    [2,1,1,1,0,0,0],
+    [2,1,1,1,1,0,0],
+    [2,2,1,1,1,3,0],
+    [2,2,1,1,1,3,3],
+    [2,4,1,1,1,1,6],
+    [2,5,5,5,5,5,6],
+    [2,5,5,5,5,6,6]
+  ], solution:[ [0,4],[1,2],[2,0],[3,5],[4,1],[5,3],[6,6] ] }
+];
+const QUEEN_COLORS = ['#fca5a5','#fdba74','#fde047','#86efac','#93c5fd','#c4b5fd','#f9a8d4','#a7f3d0'];
+
+/* =========================================================
+   === QUEEN ===
+   ========================================================= */
+const Queen = {
+  state: null,
+  init() {
+    const idx = dateSeed() % QUEEN_PUZZLES.length;
+    const puz = QUEEN_PUZZLES[idx]; const n=puz.n;
+    this.state = { puz, n, marks: Array.from({length:n},()=>Array(n).fill(0)), over:false }; // 0 empty,1 queen,2 x
+    const view = $('#view-queen'); view.innerHTML='';
+    view.append(gameHeader('Queen', 'Una ♛ per ogni riga, colonna e regione colorata. Le regine non si toccano.', [
+      chip('','🔄 Reset','', ()=>this.reset()),
+      chip('','❔','', ()=>helpModal('Come si gioca · Queen',[
+        'Posiziona <b>una regina ♛</b> per ogni riga, colonna e regione colorata.',
+        'Le regine <b>non possono toccarsi</b>, nemmeno in diagonale.',
+        'Primo tocco: ✕ (segnaposto). Secondo tocco: ♛. Terzo: cancella.',
+        'Le regine in conflitto sono evidenziate in rosso.'
+      ]))
+    ]));
+    const grid = el('div', { class:'grid-board', id:'queenBoard', role:'grid', 'aria-label':'Scacchiera Queen', style:{gridTemplateColumns:`repeat(${n},1fr)`, gap:'0', width:'min(420px,92vw)'} });
+    for (let r=0;r<n;r++) for (let c=0;c<n;c++) {
+      const cell = el('div', { class:'gc queen-cell', 'data-r':r,'data-c':c, role:'gridcell', tabindex:'0',
+        'aria-label':`riga ${r+1} colonna ${c+1}`, style:{ background:QUEEN_COLORS[puz.regions[r][c]], borderRadius:'0', color:'#1a1a1a' } });
+      grid.append(cell);
+    }
+    grid.addEventListener('click', e=>{ const cell=e.target.closest('.gc'); if(cell)this.tap(+cell.dataset.r,+cell.dataset.c); });
+    grid.addEventListener('keydown', e=>{ if(e.key===' '||e.key==='Enter'){const cell=e.target.closest('.gc');if(cell){e.preventDefault();this.tap(+cell.dataset.r,+cell.dataset.c);}} });
+    view.append(grid);
+    this.validate();
+  },
+  destroy(){},
+  reset(){ const n=this.state.n; this.state.marks=Array.from({length:n},()=>Array(n).fill(0)); this.state.over=false; this.renderAll(); this.validate(); },
+  tap(r,c){ const s=this.state; if(s.over)return; s.marks[r][c]=(s.marks[r][c]+1)%3; this.renderCell(r,c); this.validate(); },
+  renderCell(r,c){ const cell=$(`#queenBoard .gc[data-r="${r}"][data-c="${c}"]`); cell.textContent=['','✕','♛'][this.state.marks[r][c]]; },
+  renderAll(){ const n=this.state.n; for(let r=0;r<n;r++)for(let c=0;c<n;c++)this.renderCell(r,c); },
+  validate(){
+    const s=this.state; const n=s.n; const bad=new Set();
+    const queens=[]; for(let r=0;r<n;r++)for(let c=0;c<n;c++)if(s.marks[r][c]===2)queens.push([r,c]);
+    // row/col/region/adjacency conflicts
+    for(let i=0;i<queens.length;i++)for(let j=i+1;j<queens.length;j++){
+      const[a,b]=[queens[i],queens[j]];
+      if(a[0]===b[0]||a[1]===b[1]||s.puz.regions[a[0]][a[1]]===s.puz.regions[b[0]][b[1]] || (Math.abs(a[0]-b[0])<=1&&Math.abs(a[1]-b[1])<=1)){
+        bad.add(a[0]+'-'+a[1]); bad.add(b[0]+'-'+b[1]);
+      }
+    }
+    $$('#queenBoard .gc').forEach(c=>c.classList.toggle('bad', bad.has(c.dataset.r+'-'+c.dataset.c)));
+    if(queens.length===n && bad.size===0 && !s.over){
+      s.over=true; Stats.record('queen',true); refreshHome();
+      victoryModal({ game:'queen', message:'Tutte le regine sono al loro posto!', shareFn:()=>copyText(`MentePronta · Queen ${todayStr()}\nRisolto ♛\nmentepronta`) });
+    }
+  }
+};
+
+/* =========================================================
+   === DATA: PATCHES (3 puzzle) ===
+   target: cells to fill on grid. pieces: list of tetromino shapes + color.
+   Each puzzle designed so pieces tile the target exactly.
+   ========================================================= */
+// Ogni puzzle: i pezzi tassellano esattamente la forma target (ruotabili in gioco).
+const PATCHES_PUZZLES = [
+  { size:4,
+    target:[[0,0],[0,1],[0,2],[0,3],[1,0],[1,1],[1,2],[1,3],[2,0],[2,1],[2,2],[2,3],[3,0],[3,1],[3,2],[3,3]],
+    pieces:[
+      { color:'#fca5a5', cells:[[0,0],[0,1],[1,0],[1,1]] },
+      { color:'#fdba74', cells:[[0,0],[0,1],[1,0],[2,0]] },
+      { color:'#fde047', cells:[[0,0],[1,0],[2,0]] },
+      { color:'#86efac', cells:[[0,0],[1,0]] },
+      { color:'#93c5fd', cells:[[0,0],[1,0],[1,1]] }
+    ]
+  },
+  { size:5,
+    target:[[0,1],[0,2],[0,3],[1,0],[1,1],[1,2],[1,3],[1,4],[2,1],[2,2],[2,3],[3,1],[3,2],[3,3]],
+    pieces:[
+      { color:'#fca5a5', cells:[[0,0],[0,1]] },
+      { color:'#fdba74', cells:[[0,0],[1,0],[1,1]] },
+      { color:'#fde047', cells:[[0,0],[0,1],[1,1]] },
+      { color:'#86efac', cells:[[0,0],[1,0]] },
+      { color:'#93c5fd', cells:[[0,2],[1,0],[1,1],[1,2]] }
+    ]
+  },
+  { size:5,
+    target:[[0,2],[1,1],[1,2],[1,3],[2,0],[2,1],[2,2],[2,3],[2,4],[3,1],[3,2],[3,3],[4,2]],
+    pieces:[
+      { color:'#fca5a5', cells:[[0,1],[1,0],[1,1]] },
+      { color:'#fdba74', cells:[[0,0],[1,0],[1,1],[2,0]] },
+      { color:'#fde047', cells:[[0,0],[0,1],[0,2],[1,1]] },
+      { color:'#86efac', cells:[[0,0],[1,0]] }
+    ]
+  }
+];
+
+/* =========================================================
+   === PATCHES ===
+   Click a piece to select, R to rotate, click target cell to place anchor.
+   ========================================================= */
+const Patches = {
+  state: null,
+  init() {
+    const idx = dateSeed() % PATCHES_PUZZLES.length;
+    const puz = PATCHES_PUZZLES[idx];
+    const targetSet = new Set(puz.target.map(p=>p[0]+'-'+p[1]));
+    const pieces = puz.pieces.map((p,i)=>({ id:i, color:p.color, cells:normShape(p.cells), placed:null, rot:0 }));
+    this.state = { puz, targetSet, pieces, selected:null, fill:{}, over:false };
+    const view = $('#view-patches'); view.innerHTML='';
+    view.append(gameHeader('Patches', 'Incastra tutti i pezzi per riempire esattamente la forma evidenziata.', [
+      chip('','🔁 Ruota (R)','', ()=>this.rotateSel()),
+      chip('','🔄 Reset','', ()=>this.reset()),
+      chip('','❔','', ()=>helpModal('Come si gioca · Patches',[
+        'Riempi tutte le caselle <b>evidenziate</b> usando i pezzi.',
+        'Clicca un pezzo per <b>selezionarlo</b>, poi clicca una casella per posizionarlo.',
+        'Premi <b>R</b> o il pulsante per <b>ruotare</b> il pezzo selezionato.',
+        'Clicca un pezzo già posato per rimuoverlo. Niente sovrapposizioni o fuoriuscite.'
+      ]))
+    ]));
+    const layout = el('div', { class:'patch-layout' });
+    const size=puz.size;
+    const board = el('div', { class:'grid-board', id:'patchBoard', role:'grid', 'aria-label':'Tavola Patches', style:{gridTemplateColumns:`repeat(${size},1fr)`, gap:'2px', width:'min(360px,90vw)'} });
+    for(let r=0;r<size;r++)for(let c=0;c<size;c++){
+      const isT=targetSet.has(r+'-'+c);
+      const cell=el('div',{ class:'gc', 'data-r':r,'data-c':c, role:'gridcell',
+        style: isT?{background:'var(--color-surface-2)', border:'2px dashed var(--color-border)'}:{visibility:'hidden'} });
+      board.append(cell);
+    }
+    board.addEventListener('click', e=>{ const cell=e.target.closest('.gc'); if(cell)this.place(+cell.dataset.r,+cell.dataset.c); });
+    const tray = el('div', { class:'tray', id:'patchTray' });
+    layout.append(board, tray);
+    view.append(layout);
+    this._key = e=>{ if(location.hash.replace('#','')!=='patches')return; if(e.key==='r'||e.key==='R')this.rotateSel(); };
+    document.addEventListener('keydown', this._key);
+    this.renderTray(); this.renderBoard();
+  },
+  destroy(){ if(this._key)document.removeEventListener('keydown',this._key); },
+  reset(){ this.state.pieces.forEach(p=>{p.placed=null;p.rot=0;p.cells=normShape(this.state.puz.pieces[p.id].cells);}); this.state.fill={}; this.state.selected=null; this.state.over=false; this.renderTray(); this.renderBoard(); },
+  renderTray(){
+    const tray=$('#patchTray'); tray.innerHTML='';
+    this.state.pieces.forEach(p=>{
+      const maxR=Math.max(...p.cells.map(c=>c[0]))+1, maxC=Math.max(...p.cells.map(c=>c[1]))+1;
+      const pg=el('div',{ class:'piece'+(p.placed?' used':'')+(this.state.selected===p.id?' sel':''), 'data-id':p.id,
+        style:{gridTemplateColumns:`repeat(${maxC},26px)`}, onclick:()=>this.selectPiece(p.id) });
+      const set=new Set(p.cells.map(c=>c[0]+'-'+c[1]));
+      for(let r=0;r<maxR;r++)for(let c=0;c<maxC;c++){
+        pg.append(el('div',{ class:'pcell'+(set.has(r+'-'+c)?'':' empty'), style: set.has(r+'-'+c)?{background:p.color}:{} }));
+      }
+      tray.append(pg);
+    });
+  },
+  selectPiece(id){ const p=this.state.pieces.find(x=>x.id===id); if(p.placed){ this.removePiece(id); return; } this.state.selected = this.state.selected===id?null:id; this.renderTray(); },
+  rotateSel(){ const id=this.state.selected; if(id==null)return; const p=this.state.pieces.find(x=>x.id===id); p.cells=normShape(p.cells.map(([r,c])=>[c,-r])); p.rot=(p.rot+1)%4; this.renderTray(); },
+  place(r,c){
+    const id=this.state.selected; if(id==null){ toast('Seleziona prima un pezzo'); return; }
+    const p=this.state.pieces.find(x=>x.id===id);
+    const target=p.cells.map(([dr,dc])=>[r+dr,c+dc]);
+    for(const[tr,tc]of target){ if(!this.state.targetSet.has(tr+'-'+tc)){ toast('Fuori dalla forma'); this.flash(target,false); return; } if(this.state.fill[tr+'-'+tc]!=null){ toast('Sovrapposizione'); this.flash(target,false); return; } }
+    target.forEach(([tr,tc])=>this.state.fill[tr+'-'+tc]=id);
+    p.placed=[r,c]; this.state.selected=null;
+    this.renderTray(); this.renderBoard();
+    this.checkWin();
+  },
+  removePiece(id){ for(const k in this.state.fill)if(this.state.fill[k]===id)delete this.state.fill[k]; this.state.pieces.find(x=>x.id===id).placed=null; this.renderTray(); this.renderBoard(); },
+  flash(cells,ok){ cells.forEach(([r,c])=>{ const cell=$(`#patchBoard .gc[data-r="${r}"][data-c="${c}"]`); if(cell){ cell.style.boxShadow=`inset 0 0 0 3px ${ok?'var(--color-success)':'var(--color-error)'}`; setTimeout(()=>cell.style.boxShadow='',500); } }); },
+  renderBoard(){
+    $$('#patchBoard .gc').forEach(cell=>{
+      const k=cell.dataset.r+'-'+cell.dataset.c;
+      if(!this.state.targetSet.has(k))return;
+      const id=this.state.fill[k];
+      if(id!=null){ cell.style.background=this.state.pieces.find(p=>p.id===id).color; cell.style.border='2px solid oklch(from var(--color-text) l c h /0.15)'; }
+      else { cell.style.background='var(--color-surface-2)'; cell.style.border='2px dashed var(--color-border)'; }
+    });
+  },
+  checkWin(){
+    const s=this.state; if(s.over)return;
+    for(const k of s.targetSet) if(s.fill[k]==null) return;
+    s.over=true; Stats.record('patches',true); refreshHome();
+    victoryModal({ game:'patches', message:'Forma completata con tutti i pezzi!', shareFn:()=>copyText(`MentePronta · Patches ${todayStr()}\nRisolto 🧩\nmentepronta`) });
+  }
+};
+function normShape(cells){
+  const minR=Math.min(...cells.map(c=>c[0])), minC=Math.min(...cells.map(c=>c[1]));
+  return cells.map(([r,c])=>[r-minR,c-minC]).sort((a,b)=>a[0]-b[0]||a[1]-b[1]);
+}
+
+/* =========================================================
+   === DATA: MEMORIA ===
+   ========================================================= */
+const MEMORIA_PAIRS = [
+  ['🐶','Cane'],['🐱','Gatto'],['🦊','Volpe'],['🐻','Orso'],['🦁','Leone'],['🐸','Rana'],
+  ['🍎','Mela'],['🍋','Limone'],['🍇','Uva'],['🍓','Fragola'],['🍒','Ciliegia'],['🥕','Carota'],
+  ['🌞','Sole'],['🌙','Luna'],['⭐','Stella'],['🌈','Arcobaleno'],['🌳','Albero'],['🌹','Rosa'],
+  ['🚗','Auto'],['✈️','Aereo'],['🚲','Bici'],['⛵','Barca'],['🏠','Casa'],['🎈','Palloncino']
+];
+
+/* =========================================================
+   === MEMORIA ===
+   ========================================================= */
+const Memoria = {
+  state: null,
+  diffs: { Facile:8, Medio:10, Difficile:12 },
+  cols: { 8:4, 10:5, 12:6 },
+  init() {
+    if (!this.state) this.state = { diff:'Facile' };
+    this.start(this.state.diff);
+  },
+  destroy(){},
+  start(diff) {
+    const pairs = this.diffs[diff];
+    const rnd = seededRand(diff.length+5);
+    const chosen = shuffle(MEMORIA_PAIRS, rnd).slice(0, pairs);
+    const deck = shuffle(chosen.flatMap((p,i)=>[{id:i,...p},{id:i,...p}]), seededRand(pairs));
+    this.state = { diff, deck, flipped:[], matched:0, flips:0, start:Date.now(), over:false, lock:false };
+    const view = $('#view-memoria'); view.innerHTML='';
+    view.append(gameHeader('Memoria', 'Trova tutte le coppie di parole italiane girando le carte.', [
+      ...Object.keys(this.diffs).map(d=>chip('toggle'+(d===diff?' on':''), d, 'memd'+d, ()=>this.start(d))),
+      chip('','❔','', ()=>helpModal('Come si gioca · Memoria',[
+        'Gira due carte alla volta: se combaciano restano scoperte.',
+        'Trova tutte le coppie nel minor numero di mosse e tempo.',
+        'Difficoltà: Facile (8), Medio (10), Difficile (12 coppie).'
+      ]))
+    ]));
+    view.append(el('div', { class:'stat-row' }, 'Mosse: ', el('b',{id:'memFlips',text:'0'}), 'Coppie: ', el('b',{id:'memPairs',text:'0/'+pairs}), 'Tempo: ', el('b',{id:'memTime',text:'00:00'})));
+    const cols = this.cols[pairs];
+    const grid = el('div', { class:'mem-grid', id:'memGrid', role:'grid', 'aria-label':'Carte memoria', style:{gridTemplateColumns:`repeat(${cols},1fr)`} });
+    this.state.deck.forEach((card,i)=>{
+      const c = el('div', { class:'mem-card', 'data-i':i, role:'gridcell', tabindex:'0', 'aria-label':'carta coperta',
+        onclick:()=>this.flip(i) });
+      c.append(el('div', { class:'mem-inner' },
+        el('div', { class:'mem-face mem-front', text:'?' }),
+        el('div', { class:'mem-face mem-back' }, el('span',{text:card[0]}), el('small',{text:card[1]}))
+      ));
+      grid.append(c);
+    });
+    view.append(grid);
+    this._timer = setInterval(()=>{ if(!this.state.over){ const s=Math.floor((Date.now()-this.state.start)/1000); $('#memTime').textContent=`${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`; } },1000);
+  },
+  flip(i) {
+    const s=this.state; if(s.lock||s.over)return;
+    const card=$(`#memGrid .mem-card[data-i="${i}"]`);
+    if(card.classList.contains('flipped')||card.classList.contains('matched'))return;
+    card.classList.add('flipped'); s.flipped.push(i);
+    if(s.flipped.length===2){
+      s.flips++; $('#memFlips').textContent=s.flips; s.lock=true;
+      const [a,b]=s.flipped;
+      if(s.deck[a].id===s.deck[b].id){
+        setTimeout(()=>{ [a,b].forEach(x=>$(`#memGrid .mem-card[data-i="${x}"]`).classList.add('matched')); s.matched++; $('#memPairs').textContent=s.matched+'/'+this.diffs[s.diff]; s.flipped=[]; s.lock=false; this.checkWin(); },450);
+      } else {
+        setTimeout(()=>{ [a,b].forEach(x=>$(`#memGrid .mem-card[data-i="${x}"]`).classList.remove('flipped')); s.flipped=[]; s.lock=false; },800);
+      }
+    }
+  },
+  checkWin() {
+    const s=this.state; if(s.matched!==this.diffs[s.diff])return;
+    s.over=true; clearInterval(this._timer);
+    const sec=Math.floor((Date.now()-s.start)/1000); const time=`${String(Math.floor(sec/60)).padStart(2,'0')}:${String(sec%60).padStart(2,'0')}`;
+    Stats.record('memoria',true); refreshHome();
+    victoryModal({ game:'memoria', message:`Tutte le coppie trovate in ${s.flips} mosse e ${time}!`, shareFn:()=>copyText(`MentePronta · Memoria ${todayStr()}\n${s.flips} mosse · ${time} 🃏\nmentepronta`) });
+  }
+};
+
+/* =========================================================
+   === DATA: ANAGRAMMA (10 word sets) ===
+   ========================================================= */
+// Parole italiane di 6-9 lettere, una per giorno (date mod 10)
+const ANAGRAMMA_SET = ["FINESTRA","GIARDINO","CAVALLO","MONTAGNA","TASTIERA","OSPEDALE","FARFALLA","CHITARRA","PRIMAVERA","BISCOTTO"];
+
+/* =========================================================
+   === ANAGRAMMA ===
+   ========================================================= */
+const Anagramma = {
+  state: null,
+  init() {
+    const idx = dateSeed() % ANAGRAMMA_SET.length;
+    const word = ANAGRAMMA_SET[idx];
+    const rnd = seededRand(3);
+    let scrambled;
+    do { scrambled = shuffle(word.split(''), rnd); } while (scrambled.join('')===word);
+    this.state = { word, pool: scrambled.map((ch,i)=>({ch,id:i,used:false})), slots: Array(word.length).fill(null), attempts:0, max:3, over:false };
+    const view = $('#view-anagramma'); view.innerHTML='';
+    view.append(gameHeader('Anagramma', 'Riordina le lettere per ricostruire la parola italiana nascosta.', [
+      chip('','🔀 Mescola','', ()=>this.shufflePool()),
+      chip('','❔','', ()=>helpModal('Come si gioca · Anagramma',[
+        'Clicca le lettere in basso per inserirle negli spazi.',
+        'Clicca una lettera negli spazi per rimuoverla.',
+        'Hai <b>3 tentativi</b> per indovinare la parola, poi viene rivelata.'
+      ]))
+    ]));
+    view.append(el('div',{class:'stat-row'}, 'Lettere: ', el('b',{text:word.length}), 'Tentativi: ', el('b',{id:'anaAtt',text:'0/3'})));
+    const wrap = el('div', { class:'ana-wrap' });
+    wrap.append(el('div', { class:'ana-slots', id:'anaSlots', role:'group', 'aria-label':'Parola in costruzione' }));
+    wrap.append(el('div', { class:'ana-pool', id:'anaPool', role:'group', 'aria-label':'Lettere disponibili' }));
+    wrap.append(el('div', { style:{display:'flex',gap:'0.6rem',marginTop:'0.5rem'} },
+      el('button', { class:'btn-primary', id:'anaCheck', onclick:()=>this.check(), text:'Verifica' }),
+      el('button', { class:'btn-ghost', onclick:()=>this.clearSlots(), text:'Cancella' })
+    ));
+    view.append(wrap);
+    this.render();
+  },
+  destroy(){},
+  shufflePool(){ const s=this.state; const free=s.pool.filter(p=>!p.used); const sh=shuffle(free,mulberry32(Date.now())); let i=0; s.pool=s.pool.map(p=>p.used?p:sh[i++]); this.render(); },
+  clearSlots(){ const s=this.state; s.slots.fill(null); s.pool.forEach(p=>p.used=false); this.render(); },
+  render(){
+    const s=this.state;
+    const slots=$('#anaSlots'); slots.innerHTML='';
+    s.slots.forEach((p,i)=>{
+      const t=el('div',{ class:'ana-tile placed', 'data-slot':i, onclick:()=>this.removeFromSlot(i), 'aria-label':p?p.ch:'vuoto' });
+      t.textContent=p?p.ch:''; if(!p){t.classList.remove('placed'); t.style.background='var(--color-surface-2)';}
+      slots.append(t);
+    });
+    const pool=$('#anaPool'); pool.innerHTML='';
+    s.pool.forEach(p=>{
+      if(p.used)return;
+      pool.append(el('div',{ class:'ana-tile', onclick:()=>this.addToSlot(p.id), 'aria-label':'lettera '+p.ch, text:p.ch }));
+    });
+    $('#anaAtt').textContent=s.attempts+'/'+s.max;
+  },
+  addToSlot(id){ const s=this.state; const p=s.pool.find(x=>x.id===id); if(p.used)return; const i=s.slots.indexOf(null); if(i<0)return; s.slots[i]=p; p.used=true; this.render(); },
+  removeFromSlot(i){ const s=this.state; const p=s.slots[i]; if(!p)return; p.used=false; s.slots[i]=null; this.render(); },
+  check(){
+    const s=this.state; if(s.over)return;
+    if(s.slots.includes(null)){ toast('Completa la parola'); return; }
+    const guess=s.slots.map(p=>p.ch).join('');
+    if(guess===s.word){ s.over=true; Stats.record('anagramma',true); refreshHome();
+      victoryModal({ game:'anagramma', message:`Esatto! La parola era ${s.word}.`, shareFn:()=>copyText(`MentePronta · Anagramma ${todayStr()}\nIndovinata al tentativo ${s.attempts+1} 🔡\nmentepronta`) });
+      return;
+    }
+    s.attempts++; this.render();
+    if(s.attempts>=s.max){ s.over=true; Stats.record('anagramma',false); refreshHome();
+      gameOverModal({ game:'anagramma', message:`La parola era: <strong>${s.word}</strong>` });
+    } else { toast(`Sbagliato! Tentativi rimasti: ${s.max-s.attempts}`); this.clearSlots(); }
+  }
+};
+
+/* =========================================================
+   === SHARED UI HELPERS ===
+   ========================================================= */
+function gameHeader(title, desc, actions) {
+  const head = el('div', { class:'game-head' },
+    el('div', {}, el('h1', { text:title }), el('p', { text:desc })),
+    el('div', { class:'actions' }, ...actions)
+  );
+  return head;
+}
+function chip(extra, label, id, onclick) {
+  const props = { class:'chip-btn '+extra, onclick };
+  if (id) props.id = id;
+  return el('button', props, label);
+}
+
+/* =========================================================
+   === HOME PAGE ===
+   ========================================================= */
+function renderHome() {
+  const view = $('#view-home'); view.innerHTML='';
+  const d = new Date();
+  const dateLabel = d.toLocaleDateString('it-IT', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+  view.append(el('div', { class:'hero' },
+    el('h1', { text:'Il tuo allenamento quotidiano' }),
+    el('p', { text:'Allenati ogni giorno con le parole e la logica.' }),
+    el('p', { class:'date', text:'📅 '+dateLabel })
+  ));
+  const grid = el('div', { class:'card-grid', id:'homeGrid' });
+  GAMES.forEach(g => grid.append(gameCard(g)));
+  view.append(grid);
+}
+function gameCard(g) {
+  const s = Stats.get(g.id);
+  const card = el('a', { class:'game-card', href:'#'+g.id, 'aria-label':g.name });
+  if (s.doneToday) card.append(el('span', { class:'badge done', text:'✓ Fatto' }));
+  card.append(
+    el('div', { class:'emoji', text:g.emoji }),
+    el('h3', { text:g.name }),
+    el('p', { text:g.desc }),
+    el('div', { class:'meta' },
+      el('span', { class:'badge '+diffClass(g.diff), text: diffDot(g.diff)+' '+g.diff }),
+      s.streak>0 ? el('span', { class:'streak', text:'🔥 '+s.streak }) : el('span',{class:'streak'})
+    ),
+    el('span', { class:'card-cta', text:'Gioca →' })
+  );
+  return card;
+}
+function refreshHome() {
+  if (location.hash.replace('#','')==='home' || location.hash==='') renderHome();
+}
+
+/* =========================================================
+   === NAV TABS ===
+   ========================================================= */
+function buildNav() {
+  const nav = $('#navTabs');
+  GAMES.forEach(g => nav.append(el('a', { href:'#'+g.id, 'data-tab':g.id, text:g.name })));
+}
+
+/* =========================================================
+   === ROUTER ===
+   ========================================================= */
+let currentModule = null;
+const moduleMap = { parole:()=>Wordle, cruciverba:()=>Cruciverba, zip:()=>Zip, tango:()=>Tango, queen:()=>Queen, patches:()=>Patches, memoria:()=>Memoria, anagramma:()=>Anagramma };
+function route() {
+  let hash = location.hash.replace('#','') || 'home';
+  if (hash!=='home' && !moduleMap[hash]) hash='home';
+  // teardown previous
+  if (currentModule && currentModule.destroy) try { currentModule.destroy(); } catch(e){}
+  currentModule = null;
+  clearCountdowns();
+  closeModal();
+  // views
+  $$('.view').forEach(v=>v.classList.remove('active'));
+  const view = $('#view-'+hash); if(view) view.classList.add('active');
+  // nav highlight
+  $$('#navTabs a').forEach(a=>a.classList.toggle('active', a.dataset.tab===hash));
+  // init
+  if (hash==='home') { renderHome(); }
+  else { const mod = moduleMap[hash](); currentModule = mod; mod.init(); }
+  window.scrollTo(0,0);
+}
+
+/* =========================================================
+   === THEME TOGGLE ===
+   ========================================================= */
+function initTheme() {
+  const prefersDark = matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.setAttribute('data-theme', prefersDark?'dark':'light');
+  updateThemeIcon();
+  $('#themeToggle').addEventListener('click', ()=>{
+    const cur = document.documentElement.getAttribute('data-theme');
+    document.documentElement.setAttribute('data-theme', cur==='dark'?'light':'dark');
+    updateThemeIcon();
+  });
+}
+function updateThemeIcon() {
+  const dark = document.documentElement.getAttribute('data-theme')==='dark';
+  $('#themeToggle').textContent = dark?'☀️':'🌙';
+  $('#themeToggle').setAttribute('aria-label', dark?'Passa a tema chiaro':'Passa a tema scuro');
+}
+
+/* =========================================================
+   === INIT ===
+   ========================================================= */
+function start() {
+  initTheme();
+  buildNav();
+  window.addEventListener('hashchange', route);
+  route();
+}
+return { start, Stats, Wordle };
+})();
+document.addEventListener('DOMContentLoaded', App.start);
+</script>
+</body>
+</html>
