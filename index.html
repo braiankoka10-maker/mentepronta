@@ -600,6 +600,51 @@ nav.tabs a.active { animation: tabPulse 0.25s ease; }
 .conn-tile.sel { background: var(--color-text); color: var(--color-bg); transform: scale(0.96); }
 .conn-actions { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin: 1.1rem auto 0; max-width: 560px; }
 .conn-actions .btn-primary:disabled { opacity: 0.45; pointer-events: none; }
+
+/* ===================== TEMA MINIMAL & PULITO ===================== */
+:root { --radius-lg: 12px; }
+body { background: var(--color-bg); }
+header { background: oklch(from var(--color-surface) l c h / 0.92); box-shadow: none; border-bottom: 1px solid var(--color-border); }
+/* niente testo sfumato/animato: tinta piena, più pulito */
+.logo b, .grad { background: none; -webkit-text-fill-color: currentColor; color: var(--color-primary); animation: none; background-size: auto; }
+.eyebrow { background: var(--color-surface-2); border: 1px solid var(--color-border); color: var(--color-text-muted); }
+nav.tabs a.active { box-shadow: none; }
+
+/* card piatte ed essenziali */
+.game-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 12px; box-shadow: none; transition: border-color var(--transition), box-shadow var(--transition); }
+.game-card:hover { transform: none; border-color: var(--color-text-muted); box-shadow: 0 6px 18px -12px oklch(from var(--color-text) l c h / 0.4); }
+.game-card .emoji { background: var(--color-surface-2); box-shadow: none; border-radius: 10px; }
+.game-card:hover .emoji { animation: none; }
+.game-card .card-cta, .game-card:hover .card-cta { gap: 0.3rem; }
+
+/* pulsanti sobri */
+.btn-primary { box-shadow: none; }
+.btn-primary::after { display: none; }
+.btn-primary:hover { background: var(--color-primary-hover); }
+.chip-btn { box-shadow: none; }
+
+/* superfici con ombra leggera e uniforme */
+.board-card, .zip-wrap, .modal, .login-card, .locked-card { box-shadow: 0 10px 34px -20px oklch(from var(--color-text) l c h / 0.35); }
+.login-card::before { display: none; }
+.login-card { border-radius: 16px; }
+#loginOverlay { background: var(--color-bg); }
+.user-chip { box-shadow: none; }
+.user-chip .avatar { box-shadow: none; }
+
+/* classifica essenziale */
+.lb-row { box-shadow: none; border: 1px solid var(--color-border); }
+.lb-row:hover { transform: none; box-shadow: none; background: var(--color-surface-2); }
+.lb-row.me { background: var(--color-surface); border-color: var(--color-primary); }
+
+/* schermata lock pulita */
+.locked-emoji { animation: none; box-shadow: none; background: var(--color-surface-2); }
+
+/* meno movimento: solo una leggera entrata */
+footer { background: none; }
+.card-grid .game-card { animation: cardIn 0.4s ease forwards; }
+@media (prefers-reduced-motion: no-preference) {
+  .grad { animation: none; }
+}
 </style>
 </head>
 <body>
@@ -691,12 +736,13 @@ function mulberry32(seed) {
     return ((t ^ t >>> 14) >>> 0) / 4294967296;
   };
 }
-const todayStr = () => new Date().toISOString().slice(0,10);
+// Data del giorno nel fuso orario italiano (Europe/Rome): il puzzle cambia a mezzanotte italiana.
+const todayStr = () => new Intl.DateTimeFormat('en-CA', { timeZone:'Europe/Rome', year:'numeric', month:'2-digit', day:'2-digit' }).format(new Date());
 const dateSeed = () => parseInt(todayStr().replace(/-/g,''), 10);
 function seededRand(salt=0) { return mulberry32(dateSeed() + salt*7919); }
 function dayOfYear() {
-  const d = new Date(); const start = new Date(d.getFullYear(),0,0);
-  return Math.floor((d - start) / 86400000);
+  const [y,m,d] = todayStr().split('-').map(Number);
+  return Math.floor((Date.UTC(y,m-1,d) - Date.UTC(y,0,0)) / 86400000);
 }
 function shuffle(arr, rnd) {
   const a = arr.slice();
@@ -863,7 +909,15 @@ function fmtClock(ms) {
    === COUNTDOWN TO MIDNIGHT ===
    ========================================================= */
 let countdownTimers = [];
-function nextMidnight() { const d = new Date(); d.setHours(24,0,0,0); return d; }
+function nextMidnight() {
+  // istante della prossima mezzanotte italiana (indipendente dal fuso del giocatore)
+  const now = new Date();
+  const p = new Intl.DateTimeFormat('en-GB', { timeZone:'Europe/Rome', hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false }).formatToParts(now);
+  const get = t => +p.find(x=>x.type===t).value;
+  let h = get('hour'); if (h === 24) h = 0;
+  const secsLeft = 24*3600 - (h*3600 + get('minute')*60 + get('second'));
+  return new Date(now.getTime() + secsLeft*1000);
+}
 function fmtHMS(ms) {
   if (ms < 0) ms = 0;
   const s = Math.floor(ms/1000);
