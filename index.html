@@ -252,8 +252,8 @@ main { max-width: 1100px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
 /* QUEEN */
 .queen-grid { box-shadow: 0 0 0 3px oklch(from var(--color-text) l c h / 0.9); border-radius: 10px; }
 .queen-cell { border: 1px solid oklch(from var(--color-text) l c h / 0.32); cursor: pointer; }
-.queen-cell .q-x { color: oklch(from var(--color-text) l c h / 0.5); font-size: 0.55em; font-weight: 700; }
-.queen-cell .q-crown { font-size: 0.86em; line-height: 1; color: #1a1a1a; filter: drop-shadow(0 1px 1px rgba(0,0,0,0.35)); animation: pop 0.18s ease; }
+.queen-cell .q-x { color: rgba(255,255,255,0.7); font-size: 0.55em; font-weight: 700; }
+.queen-cell .q-crown { font-size: 0.86em; line-height: 1; color: #fff; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.7)); animation: pop 0.18s ease; }
 .queen-cell.bad { box-shadow: inset 0 0 0 3px var(--color-error); z-index: 4; }
 .queen-cell.bad .q-crown { color: var(--color-error); }
 
@@ -2168,6 +2168,15 @@ function toast(msg) {
   const t = $('#toast'); t.textContent = msg; t.classList.add('show');
   clearTimeout(toast._t); toast._t = setTimeout(()=>t.classList.remove('show'), 1800);
 }
+const MAX_HINTS = 3;
+function hintCount(game) { return +localStorage.getItem('mp_hint_'+game+'_'+todayStr())||0; }
+function useHint(game) {
+  const n = hintCount(game);
+  if (n >= MAX_HINTS) { toast(`Hai già usato tutti i ${MAX_HINTS} suggerimenti`); return false; }
+  localStorage.setItem('mp_hint_'+game+'_'+todayStr(), n+1);
+  toast(`💡 Suggerimento ${n+1}/${MAX_HINTS}`);
+  return true;
+}
 function copyText(txt) {
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(txt).then(()=>toast('Copiato!')).catch(()=>fallbackCopy(txt));
@@ -2537,6 +2546,7 @@ const Wordle = {
     view.append(
       gameHeader('Parole', 'Indovina la parola italiana di 5 lettere in 6 tentativi.', [
         chip('toggle','Hard','hardBtn', ()=>this.toggleHard()),
+        chip('','💡','', ()=>this.hint()),
         chip('','📊','', ()=>statsModal('parole','Parole')),
         chip('','❔','', ()=>helpModal('Come si gioca · Parole',[
           'Hai <b>6 tentativi</b> per indovinare la parola di 5 lettere.',
@@ -2646,8 +2656,23 @@ const Wordle = {
     const cur = key.classList.contains('correct')?3:key.classList.contains('present')?2:key.classList.contains('absent')?1:0;
     if (rank[res] >= cur) { key.classList.remove('correct','present','absent'); key.classList.add(res); }
   },
-  shake() { const row = $('#wrow'+this.state.row); row.classList.add('shake'); setTimeout(()=>row.classList.remove('shake'),500); }
-  ,share() {
+  shake() { const row = $('#wrow'+this.state.row); row.classList.add('shake'); setTimeout(()=>row.classList.remove('shake'),500); },
+  hint() {
+    const s=this.state; if(s.over)return;
+    if(!useHint('parole'))return;
+    const revealed=new Set();
+    for(let r=0;r<s.row;r++){const res=this.score(s.board[r].join(''),s.answer);res.forEach((st,i)=>{if(st==='correct')revealed.add(i);});}
+    if(s.hints._hintCols)s.hints._hintCols.forEach(c=>revealed.add(c));
+    let col=-1; for(let c=0;c<5;c++){if(!revealed.has(c)){col=c;break;}}
+    if(col<0){toast('Tutte le lettere sono già note');return;}
+    if(!s.hints._hintCols)s.hints._hintCols=[];
+    s.hints._hintCols.push(col);
+    s.board[s.row][col]=s.answer[col]; s.col=Math.max(s.col,col+1);
+    for(let c=0;c<=col;c++) this.renderTile(s.row,c);
+    const t=$('#wt'+s.row+'-'+col);
+    t.style.borderColor='var(--color-gold)'; t.style.color='var(--color-gold)';
+  },
+  share() {
     const s = this.state;
     const emoji = { correct:'🟩', present:'🟨', absent:'⬜' };
     let grid = '';
@@ -2708,7 +2733,7 @@ const Cruciverba = {
     const view = $('#view-cruciverba'); view.innerHTML='';
     view.append(gameHeader('Cruciverba', 'Mini cruciverba 5×5. Clicca una casella, scrivi, premi Tab per cambiare direzione.', [
       chip('','✓ Verifica','', ()=>this.check()),
-      chip('','💡 Rivela','', ()=>confirmModal('Vuoi rivelare l\'intera soluzione? La partita verrà conclusa.', ()=>this.reveal())),
+      chip('','💡 Suggerimento','', ()=>this.hint()),
       chip('','❔','', ()=>helpModal('Come si gioca · Cruciverba',[
         'Completa la griglia 5×5 usando le definizioni.',
         'Clicca una casella per selezionarla; <b>Tab</b> o un secondo click cambia direzione (Orizzontale/Verticale).',
@@ -2852,6 +2877,15 @@ const Cruciverba = {
     Stats.record('cruciverba', false); refreshHome();
     gameOverModal({ game:'cruciverba', title:'Soluzione rivelata', message:'Hai rivelato la griglia. Riprova domani!' });
   },
+  hint() {
+    const s = this.state; if(s.over) return;
+    if(!useHint('cruciverba')) return;
+    for(let r=0;r<5;r++) for(let c=0;c<5;c++) {
+      if(s.sol[r][c]==='.')continue;
+      const inp=this.cellInput(r,c);
+      if(inp.value.toUpperCase()!==s.sol[r][c]){ inp.value=s.sol[r][c]; inp.closest('.cw-cell').classList.add('cw-correct'); return; }
+    }
+  },
   win() {
     const s = this.state; if (s.over) return; s.over=true; clearInterval(this._timer);
     const ms = Date.now()-s.start; const time = fmtClock(ms);
@@ -2867,9 +2901,10 @@ const Cruciverba = {
    are reachable. The full grid must be covered by the path.
    ========================================================= */
 const ZIP_PUZZLES = [
-  { size:5, label:'Facile', dots:{1:[0,0],2:[0,4],3:[4,4],4:[4,0],5:[2,2]} },
   { size:6, label:'Medio', dots:{1:[0,0],2:[0,5],3:[5,5],4:[5,0],5:[2,2],6:[3,3]} },
-  { size:6, label:'Difficile', dots:{1:[0,2],2:[2,1],3:[2,0],4:[3,4],5:[4,0],6:[5,4],7:[1,5],8:[2,3]} }
+  { size:6, label:'Difficile', dots:{1:[0,2],2:[2,1],3:[2,0],4:[3,4],5:[4,0],6:[5,4],7:[1,5],8:[2,3]} },
+  { size:7, label:'Esperto', dots:{1:[0,0],2:[2,1],3:[0,6],4:[3,6],5:[4,0],6:[5,6],7:[6,0],8:[6,6]} },
+  { size:7, label:'Master', dots:{1:[0,0],2:[6,1],3:[0,2],4:[6,3],5:[0,4],6:[6,5],7:[0,6],8:[6,6]} }
 ];
 
 /* =========================================================
@@ -3012,7 +3047,15 @@ const TANGO_PUZZLES = [
       [0,0,1,0,0,0],
       [2,0,0,0,0,1]
     ],
-    cons: [ {a:[0,1],b:[0,2],t:'='}, {a:[2,2],b:[2,3],t:'x'}, {a:[3,0],b:[4,0],t:'='}, {a:[5,2],b:[5,3],t:'x'} ]
+    cons: [ {a:[0,1],b:[0,2],t:'='}, {a:[2,2],b:[2,3],t:'x'}, {a:[3,0],b:[4,0],t:'='}, {a:[5,2],b:[5,3],t:'x'} ],
+    sol: [
+      [1,2,2,1,1,2],
+      [2,1,2,1,1,2],
+      [2,1,1,2,2,1],
+      [1,2,2,1,1,2],
+      [1,2,1,2,2,1],
+      [2,1,1,2,2,1]
+    ]
   },
   {
     given: [
@@ -3023,7 +3066,15 @@ const TANGO_PUZZLES = [
       [1,0,0,0,0,2],
       [0,0,2,1,0,0]
     ],
-    cons: [ {a:[2,0],b:[2,1],t:'='}, {a:[2,4],b:[2,5],t:'x'}, {a:[3,0],b:[3,1],t:'x'}, {a:[0,2],b:[1,2],t:'='} ]
+    cons: [ {a:[2,0],b:[2,1],t:'='}, {a:[2,4],b:[2,5],t:'x'}, {a:[3,0],b:[3,1],t:'x'}, {a:[0,2],b:[1,2],t:'='} ],
+    sol: [
+      [1,2,1,2,2,1],
+      [2,2,1,1,2,1],
+      [1,1,2,2,1,2],
+      [2,1,2,1,2,1],
+      [1,2,1,2,1,2],
+      [2,1,2,1,1,2]
+    ]
   }
 ];
 
@@ -3039,6 +3090,7 @@ const Tango = {
     this.state = { puz, board, over:false, start:Date.now() };
     const view = $('#view-tango'); view.innerHTML='';
     view.append(gameHeader('Tango', '3 soli e 3 lune per riga e colonna. Mai 3 uguali di fila. Rispetta = e ×.', [
+      chip('','💡','', ()=>this.hint()),
       chip('','🔄 Reset','', ()=>this.reset()),
       chip('','❔','', ()=>helpModal('Come si gioca · Tango',[
         'Ogni <b>riga</b> e <b>colonna</b> deve avere esattamente 3 ☀️ e 3 🌙.',
@@ -3089,6 +3141,18 @@ const Tango = {
     this.validate();
   },
   renderAll() { for(let r=0;r<6;r++)for(let c=0;c<6;c++){ this.setCell($(`#tangoBoard .gc[data-r="${r}"][data-c="${c}"]`), this.state.board[r][c], false); } },
+  hint() {
+    const s=this.state; if(s.over)return;
+    if(!useHint('tango'))return;
+    for(let r=0;r<6;r++) for(let c=0;c<6;c++){
+      if(s.puz.given[r][c]===0&&s.board[r][c]!==s.puz.sol[r][c]){
+        s.board[r][c]=s.puz.sol[r][c];
+        this.setCell($(`#tangoBoard .gc[data-r="${r}"][data-c="${c}"]`),s.board[r][c],true);
+        this.validate(); return;
+      }
+    }
+    toast('Nessun errore da correggere');
+  },
   validate() {
     const s=this.state; const b=s.board; const conflicts=new Set();
     const mark=(r,c)=>conflicts.add(r+'-'+c);
@@ -3148,9 +3212,40 @@ const QUEEN_PUZZLES = [
     [2,4,1,1,1,1,6],
     [2,5,5,5,5,5,6],
     [2,5,5,5,5,6,6]
-  ], solution:[ [0,4],[1,2],[2,0],[3,5],[4,1],[5,3],[6,6] ] }
+  ], solution:[ [0,4],[1,2],[2,0],[3,5],[4,1],[5,3],[6,6] ] },
+  { n:8, regions:[
+    [0,0,0,0,1,1,1,3],
+    [0,0,0,0,1,1,3,3],
+    [0,0,0,2,2,1,3,3],
+    [4,4,2,2,2,1,3,3],
+    [4,4,4,2,2,2,5,3],
+    [4,4,4,2,6,5,5,5],
+    [7,4,7,7,6,6,5,5],
+    [7,7,7,6,6,6,5,5]
+  ], solution:[ [0,0],[1,5],[2,3],[3,7],[4,2],[5,6],[6,4],[7,1] ] },
+  { n:8, regions:[
+    [1,1,1,2,2,0,0,4],
+    [1,1,2,2,2,0,4,4],
+    [1,3,3,3,2,0,4,4],
+    [1,3,3,3,5,0,4,4],
+    [1,3,5,5,5,5,5,4],
+    [1,3,5,5,5,5,6,4],
+    [1,7,7,7,6,6,6,4],
+    [7,7,7,7,7,6,6,4]
+  ], solution:[ [0,5],[1,0],[2,4],[3,2],[4,7],[5,3],[6,6],[7,1] ] }
 ];
-const QUEEN_COLORS = ['#fca5a5','#fdba74','#fde047','#86efac','#93c5fd','#c4b5fd','#f9a8d4','#a7f3d0'];
+const QUEEN_COLORS = [
+  'rgba(239,68,68,0.82)',
+  'rgba(249,115,22,0.82)',
+  'rgba(234,179,8,0.82)',
+  'rgba(34,197,94,0.82)',
+  'rgba(59,130,246,0.82)',
+  'rgba(168,85,247,0.82)',
+  'rgba(236,72,153,0.82)',
+  'rgba(20,184,166,0.82)',
+  'rgba(251,146,60,0.82)',
+  'rgba(100,116,139,0.82)'
+];
 
 /* =========================================================
    === QUEEN ===
@@ -3164,11 +3259,13 @@ const Queen = {
     const view = $('#view-queen'); view.innerHTML='';
     view.append(gameHeader('Queen', 'Una 👑 per ogni riga, colonna e regione colorata. Le regine non si toccano.', [
       chip('','🔄 Reset','', ()=>this.reset()),
+      chip('','💡','', ()=>this.hint()),
       chip('','❔','', ()=>helpModal('Come si gioca · Queen',[
         'Posiziona <b>una corona 👑</b> per ogni riga, colonna e regione colorata.',
         'Le corone <b>non possono toccarsi</b>, nemmeno in diagonale.',
         'Primo tocco: ✕ (escludi la casella). Secondo tocco: 👑. Terzo: cancella.',
-        'Le corone in conflitto sono evidenziate in rosso.'
+        'Le corone in conflitto sono evidenziate in rosso.',
+        '💡 Usa al massimo 3 suggerimenti per sessione.'
       ]))
     ]));
     view.append(el('div', { class:'stat-row' }, 'Tempo: ', el('b',{id:'queenTime',text:'00:00'})));
@@ -3179,9 +3276,9 @@ const Queen = {
       // bordi spessi tra regioni diverse (stile LinkedIn Queens)
       const T = r===0||reg[r-1][c]!==reg[r][c], B = r===n-1||reg[r+1][c]!==reg[r][c];
       const L = c===0||reg[r][c-1]!==reg[r][c], R = c===n-1||reg[r][c+1]!==reg[r][c];
-      const thick='3px solid #111', thin='1px solid rgba(0,0,0,0.18)';
+      const thick='3px solid rgba(255,255,255,0.85)', thin='1px solid rgba(255,255,255,0.15)';
       const cell = el('div', { class:'gc queen-cell', 'data-r':r,'data-c':c, role:'gridcell', tabindex:'0',
-        'aria-label':`riga ${r+1} colonna ${c+1}`, style:{ background:QUEEN_COLORS[reg[r][c]], borderRadius:'0', color:'#1a1a1a',
+        'aria-label':`riga ${r+1} colonna ${c+1}`, style:{ background:QUEEN_COLORS[reg[r][c]], borderRadius:'0', color:'#fff',
           borderTop:T?thick:thin, borderBottom:B?thick:thin, borderLeft:L?thick:thin, borderRight:R?thick:thin } });
       grid.append(cell);
     }
@@ -3197,6 +3294,13 @@ const Queen = {
   renderCell(r,c){ const cell=$(`#queenBoard .gc[data-r="${r}"][data-c="${c}"]`); const m=this.state.marks[r][c]; cell.innerHTML='';
     if(m===1) cell.append(el('span',{class:'q-x',text:'✕'})); else if(m===2) cell.append(el('span',{class:'q-crown',text:'👑'})); },
   renderAll(){ const n=this.state.n; for(let r=0;r<n;r++)for(let c=0;c<n;c++)this.renderCell(r,c); },
+  hint(){
+    const s=this.state; if(s.over)return;
+    if(!useHint('queen'))return;
+    for(const[r,c] of s.puz.solution){
+      if(s.marks[r][c]!==2){ s.marks[r][c]=2; this.renderCell(r,c); this.validate(); return; }
+    }
+  },
   validate(){
     const s=this.state; const n=s.n; const bad=new Set();
     const queens=[]; for(let r=0;r<n;r++)for(let c=0;c<n;c++)if(s.marks[r][c]===2)queens.push([r,c]);
@@ -3446,6 +3550,7 @@ const Anagramma = {
     this.state = { word, pool: scrambled.map((ch,i)=>({ch,id:i,used:false})), slots: Array(word.length).fill(null), attempts:0, max:3, over:false };
     const view = $('#view-anagramma'); view.innerHTML='';
     view.append(gameHeader('Anagramma', 'Riordina le lettere per ricostruire la parola italiana nascosta.', [
+      chip('','💡','', ()=>this.hint()),
       chip('','🔀 Mescola','', ()=>this.shufflePool()),
       chip('','❔','', ()=>helpModal('Come si gioca · Anagramma',[
         'Clicca le lettere in basso per inserirle negli spazi.',
@@ -3482,6 +3587,19 @@ const Anagramma = {
     });
     $('#anaAtt').textContent=s.attempts+'/'+s.max;
   },
+  hint(){
+    const s=this.state; if(s.over)return;
+    if(!useHint('anagramma'))return;
+    // Place the next correct letter in the first empty slot
+    for(let i=0;i<s.word.length;i++){
+      if(s.slots[i]===null){
+        const ch=s.word[i];
+        const p=s.pool.find(x=>x.ch===ch&&!x.used);
+        if(p){ s.slots[i]=p; p.used=true; this.render(); return; }
+      }
+    }
+    toast('Tutti i posti sono già occupati');
+  },
   addToSlot(id){ const s=this.state; const p=s.pool.find(x=>x.id===id); if(p.used)return; const i=s.slots.indexOf(null); if(i<0)return; s.slots[i]=p; p.used=true; this.render(); },
   removeFromSlot(i){ const s=this.state; const p=s.slots[i]; if(!p)return; p.used=false; s.slots[i]=null; this.render(); },
   check(){
@@ -3517,6 +3635,7 @@ const Sudoku = {
     this.state = { sol: puz.solution.split('').map(Number), grid, given: grid.map(v=>v!==0), sel:-1, over:false, start:Date.now() };
     const view=$('#view-sudoku'); view.innerHTML='';
     view.append(gameHeader('Sudoku','Ogni riga, colonna e riquadro 3×3 contiene i numeri da 1 a 9.', [
+      chip('','💡','',()=>this.hint()),
       chip('','❔','',()=>helpModal('Come si gioca · Sudoku',[
         'Riempi ogni cella vuota con un numero da <b>1 a 9</b>.',
         'Ogni <b>riga</b>, <b>colonna</b> e <b>riquadro 3×3</b> deve contenere tutti i numeri da 1 a 9 senza ripetizioni.',
@@ -3566,14 +3685,17 @@ const Sudoku = {
   },
   checkWin(){ const s=this.state; for(let i=0;i<81;i++) if(s.grid[i]!==s.sol[i]) return; s.over=true; clearInterval(this._timer); const ms=Date.now()-s.start;
     Stats.record('sudoku',true); Leaderboard.record('sudoku',ms); refreshHome();
-    victoryModal({game:'sudoku',ms,message:`Sudoku risolto in ${fmtClock(ms)}!`,shareFn:()=>copyText(`MentePronta · Sudoku ${todayStr()}\nRisolto in ${fmtClock(ms)} 🔢\nmentepronta`)}); }
+    victoryModal({game:'sudoku',ms,message:`Sudoku risolto in ${fmtClock(ms)}!`,shareFn:()=>copyText(`MentePronta · Sudoku ${todayStr()}\nRisolto in ${fmtClock(ms)} 🔢\nmentepronta`)}); },
+  hint(){ const s=this.state; if(s.over)return; if(!useHint('sudoku'))return;
+    for(let i=0;i<81;i++){ if(!s.given[i]&&s.grid[i]!==s.sol[i]){ s.grid[i]=s.sol[i]; this.render(); this.highlight(); this.checkWin(); return; } }
+    toast('Nessun errore da correggere'); }
 };
 
 /* =========================================================
    === CAMPO MINATO ===
    ========================================================= */
 const Mine = {
-  state:null, SIZE:9, MINES:10,
+  state:null, SIZE:10, MINES:22,
   nbrs(i){ const N=this.SIZE,r=Math.floor(i/N),c=i%N,res=[]; for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){ if(!dr&&!dc)continue; const nr=r+dr,nc=c+dc; if(nr>=0&&nc>=0&&nr<N&&nc<N)res.push(nr*N+nc); } return res; },
   init(){
     const N=this.SIZE,total=N*N; let mines,numbers,safe=-1;
@@ -3583,6 +3705,7 @@ const Mine = {
     this.state={ mines,numbers,revealed:new Set(),flags:new Set(),over:false,won:false,start:Date.now(),flagMode:false };
     const view=$('#view-mine'); view.innerHTML='';
     view.append(gameHeader('Campo Minato','Scopri tutte le caselle senza mine. I numeri indicano quante mine ci sono attorno.', [
+      chip('','💡','',()=>this.hint()),
       chip('toggle','🚩 Bandiera','mineFlag',()=>this.toggleFlagMode()),
       chip('','❔','',()=>helpModal('Come si gioca · Campo Minato',[
         'Scopri le caselle: il <b>numero</b> dice quante mine toccano quella casella.',
@@ -3624,6 +3747,9 @@ const Mine = {
     Stats.record('mine',false); refreshHome();
     gameOverModal({game:'mine',title:'💥 Boom!',message:'Hai colpito una mina. Riprova domani con un nuovo campo!'});
   },
+  hint(){ const s=this.state; if(s.over)return; if(!useHint('mine'))return;
+    for(let i=0;i<this.SIZE*this.SIZE;i++){ if(!s.mines.has(i)&&!s.revealed.has(i)&&!s.flags.has(i)){ this.reveal(i); return; } }
+    toast('Nessuna casella sicura disponibile'); },
   checkWin(){ const s=this.state; if(s.revealed.size!==this.SIZE*this.SIZE-this.MINES)return; s.over=true; s.won=true; clearInterval(this._timer);
     s.mines.forEach(m=>{ if(!s.flags.has(m)){ s.flags.add(m); this.renderCell(m); } }); const ms=Date.now()-s.start;
     Stats.record('mine',true); Leaderboard.record('mine',ms); refreshHome();
@@ -3643,6 +3769,7 @@ const Quindici = {
     this.state={ board,blank,N,moves:0,over:false,start:Date.now() };
     const view=$('#view-quindici'); view.innerHTML='';
     view.append(gameHeader('Quindici','Fai scorrere le tessere e rimettile in ordine da 1 a 15.', [
+      chip('','💡','',()=>this.hint()),
       chip('','❔','',()=>helpModal('Come si gioca · Quindici',[
         'Tocca una tessera <b>adiacente allo spazio vuoto</b> per farla scorrere.',
         'Obiettivo: ordinare le tessere da <b>1 a 15</b>, con lo spazio vuoto in basso a destra.',
@@ -3661,6 +3788,29 @@ const Quindici = {
   destroy(){ clearInterval(this._timer); },
   tap(i){ const s=this.state; if(s.over)return; if(this.neighbors(s.blank,s.N).includes(i)){ [s.board[s.blank],s.board[i]]=[s.board[i],s.board[s.blank]]; s.blank=i; s.moves++; $('#q15Moves').textContent=String(s.moves); this.render(); this.checkWin(); } },
   render(){ const s=this.state; for(let i=0;i<16;i++){ const t=$(`#q15Grid .q15-tile[data-i="${i}"]`); const v=s.board[i]; t.textContent=v||''; t.classList.toggle('blank',v===0); t.classList.toggle('done',v!==0&&v===i+1); } },
+  hint(){
+    const s=this.state; if(s.over)return;
+    if(!useHint('quindici'))return;
+    // find the smallest tile out of place and move blank toward it
+    for(let target=1;target<=15;target++){
+      const ti=s.board.indexOf(target);
+      if(ti!==target-1){ // tile is not in correct position
+        const nb=this.neighbors(s.blank,s.N);
+        if(nb.includes(ti)){ this.tap(ti); }
+        else { // move blank toward target
+          const tr=Math.floor((target-1)/s.N),tc=(target-1)%s.N;
+          const br=Math.floor(s.blank/s.N),bc=s.blank%s.N;
+          const pr=Math.floor(ti/s.N),pc=ti%s.N;
+          // move blank closer to tile position
+          let best=nb[0];
+          let bestDist=999;
+          nb.forEach(n=>{const nr=Math.floor(n/s.N),nc=n%s.N;const d=Math.abs(nr-pr)+Math.abs(nc-pc);if(d<bestDist){bestDist=d;best=n;}});
+          this.tap(best);
+        }
+        return;
+      }
+    }
+  },
   checkWin(){ const s=this.state; for(let i=0;i<15;i++) if(s.board[i]!==i+1)return; s.over=true; clearInterval(this._timer); const ms=Date.now()-s.start;
     Stats.record('quindici',true); Leaderboard.record('quindici',ms); refreshHome();
     victoryModal({game:'quindici',ms,message:`Risolto in ${s.moves} mosse e ${fmtClock(ms)}!`,shareFn:()=>copyText(`MentePronta · Quindici ${todayStr()}\n${s.moves} mosse · ${fmtClock(ms)} 🧮\nmentepronta`)}); }
@@ -3688,6 +3838,7 @@ const Connessioni = {
     this.state={ set, words:shuffle(all,rnd), selected:[], solved:[], mistakes:0, max:4, over:false, start:Date.now() };
     const view=$('#view-connessioni'); view.innerHTML='';
     view.append(gameHeader('Connessioni','Trova quattro gruppi di quattro parole che hanno qualcosa in comune.', [
+      chip('','💡','',()=>this.hint()),
       chip('','❔','',()=>helpModal('Come si gioca · Connessioni',[
         'Le 16 parole formano <b>4 gruppi da 4</b> con un tema in comune.',
         'Seleziona 4 parole e premi <b>Invia</b>: se sono un gruppo, vengono bloccate.',
@@ -3716,6 +3867,13 @@ const Connessioni = {
       grid.append(el('div',{class:'conn-tile'+(sel?' sel':''),onclick:()=>this.toggle(item),text:item.w})); });
     $('#connLives').textContent=s.mistakes+'/'+s.max;
     const sub=$('#connSubmit'); if(sub) sub.disabled=s.selected.length!==4;
+  },
+  hint(){
+    const s=this.state; if(s.over)return;
+    if(!useHint('connessioni'))return;
+    const unsolvedGroup=s.set.findIndex((_,i)=>!s.solved.includes(i));
+    if(unsolvedGroup<0)return;
+    toast(`💡 Un gruppo ha il tema: "${s.set[unsolvedGroup].cat}"`);
   },
   submit(){
     const s=this.state; if(s.over||s.selected.length!==4)return;
