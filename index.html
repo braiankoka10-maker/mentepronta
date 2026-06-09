@@ -1266,9 +1266,10 @@ footer { background: none; }
   transition: background .1s;
 }
 #view-sudoku .sud-cell.given { color: #1e1b4b; font-weight: 900; }
-#view-sudoku .sud-cell:nth-child(3n) { border-right: 2px solid rgba(30,27,75,.5); }
+#view-sudoku .sud-cell:nth-child(3n) { border-right: 3px solid rgba(30,27,75,.85) !important; }
+#view-sudoku .sud-cell:nth-child(9n) { border-right: 1px solid rgba(30,27,75,.2) !important; }
 #view-sudoku .sud-cell:nth-child(n+19):nth-child(-n+27),
-#view-sudoku .sud-cell:nth-child(n+46):nth-child(-n+54) { border-bottom: 2px solid rgba(30,27,75,.5); }
+#view-sudoku .sud-cell:nth-child(n+46):nth-child(-n+54) { border-bottom: 3px solid rgba(30,27,75,.85) !important; }
 #view-sudoku .sud-cell.peer { background: rgba(67,56,202,.05); }
 #view-sudoku .sud-cell.same { background: rgba(67,56,202,.12); }
 #view-sudoku .sud-cell.sel  { background: rgba(67,56,202,.25); }
@@ -1669,8 +1670,8 @@ header { background: #0f1117 !important; }
 #view-parole .key.absent  { background: #3a3a3c !important; color: #818384 !important; }
 #view-tango .tango-eq { background: #1a1810 !important; color: #fbbf24 !important; }
 #view-tango .tango-x  { background: #1a1810 !important; color: #f87171 !important; }
-#view-queen .queen-grid .gc:nth-child(odd)  { background: #2d1a3e !important; }
-#view-queen .queen-grid .gc:nth-child(even) { background: #1e1128 !important; }
+#view-queen .queen-cell { background: var(--qc, rgba(255,255,255,.1)) !important; }
+#view-queen .queen-cell:hover { filter: brightness(1.15); }
 #view-memoria .mem-back { background: #1a3a2a !important; border-color: rgba(74,222,128,.15) !important; }
 .conn-band b, .conn-band span { color: #0f0f12 !important; }
 .stat-row { background: rgba(255,255,255,.04) !important; color: #888 !important; }
@@ -1983,14 +1984,18 @@ nav.tabs a.active { background: #fff !important; color: #0f1117 !important; font
 }
 #view-sudoku .sud-cell {
   font-size: 1.35rem !important; font-weight: 700 !important;
-  color: #60a5fa !important; border: 1px solid rgba(255,255,255,.07) !important;
+  color: #93c5fd !important; border: 1px solid rgba(255,255,255,.1) !important;
   background: #17181c !important;
 }
+#view-sudoku .sud-cell:nth-child(3n) { border-right: 3px solid rgba(255,255,255,.45) !important; }
+#view-sudoku .sud-cell:nth-child(9n) { border-right: 1px solid rgba(255,255,255,.1) !important; }
+#view-sudoku .sud-cell:nth-child(n+19):nth-child(-n+27),
+#view-sudoku .sud-cell:nth-child(n+46):nth-child(-n+54) { border-bottom: 3px solid rgba(255,255,255,.45) !important; }
 #view-sudoku .sud-cell.given { color: #f0f0f0 !important; font-weight: 900 !important; }
-#view-sudoku .sud-cell.sel  { background: rgba(59,130,246,.28) !important; }
-#view-sudoku .sud-cell.peer { background: rgba(59,130,246,.06) !important; }
-#view-sudoku .sud-cell.same { background: rgba(59,130,246,.14) !important; }
-#view-sudoku .sud-cell.bad  { color: #f87171 !important; background: rgba(248,113,113,.12) !important; }
+#view-sudoku .sud-cell.sel  { background: rgba(59,130,246,.32) !important; }
+#view-sudoku .sud-cell.peer { background: rgba(59,130,246,.08) !important; }
+#view-sudoku .sud-cell.same { background: rgba(59,130,246,.18) !important; }
+#view-sudoku .sud-cell.bad  { color: #f87171 !important; background: rgba(248,113,113,.15) !important; }
 
 /* ── CONNESSIONI — dark NYT ────────────────────────────────────── */
 #view-connessioni { background: #0f0f12 !important; }
@@ -2040,9 +2045,12 @@ nav.tabs a.active { background: #fff !important; color: #0f1117 !important; font
 #view-cruciverba .cw-grid { background: #444 !important; }
 #view-cruciverba .cw-cell { background: #1e1f25 !important; }
 #view-cruciverba .cw-cell.block { background: #111 !important; }
-#view-cruciverba .cw-cell.active-word { background: #2a1f45 !important; }
-#view-cruciverba .cw-cell.active-cell { background: #3d2870 !important; }
-#view-cruciverba .cw-cell input { color: #f0f0f0 !important; }
+#view-cruciverba .cw-cell.active-word { background: #1e1545 !important; }
+#view-cruciverba .cw-cell.active-cell { background: #4c2a8a !important; box-shadow: inset 0 0 0 2px rgba(196,181,253,.55) !important; }
+#view-cruciverba .cw-cell input,
+#view-cruciverba .cw-cell input:focus { background: transparent !important; color: #e8e8ff !important; caret-color: #c4b5fd; }
+#view-cruciverba .cw-cell.cw-correct input,
+#view-cruciverba .cw-cell.cw-correct input:focus { color: #4ade80 !important; }
 
 /* ── PATCHES — dark board ──────────────────────────────────────── */
 #view-patches { background: #0c140f !important; }
@@ -3235,16 +3243,16 @@ const QUEEN_PUZZLES = [
   ], solution:[ [0,5],[1,0],[2,4],[3,2],[4,7],[5,3],[6,6],[7,1] ] }
 ];
 const QUEEN_COLORS = [
-  'rgba(239,68,68,0.82)',
-  'rgba(249,115,22,0.82)',
-  'rgba(234,179,8,0.82)',
-  'rgba(34,197,94,0.82)',
-  'rgba(59,130,246,0.82)',
-  'rgba(168,85,247,0.82)',
-  'rgba(236,72,153,0.82)',
-  'rgba(20,184,166,0.82)',
-  'rgba(251,146,60,0.82)',
-  'rgba(100,116,139,0.82)'
+  '#c0392b',
+  '#e67e22',
+  '#d4ac0d',
+  '#1e8449',
+  '#1a5276',
+  '#6c3483',
+  '#b03a7a',
+  '#0e7a6e',
+  '#935116',
+  '#566573'
 ];
 
 /* =========================================================
@@ -3276,10 +3284,11 @@ const Queen = {
       // bordi spessi tra regioni diverse (stile LinkedIn Queens)
       const T = r===0||reg[r-1][c]!==reg[r][c], B = r===n-1||reg[r+1][c]!==reg[r][c];
       const L = c===0||reg[r][c-1]!==reg[r][c], R = c===n-1||reg[r][c+1]!==reg[r][c];
-      const thick='3px solid rgba(255,255,255,0.85)', thin='1px solid rgba(255,255,255,0.15)';
+      const thick='3px solid rgba(255,255,255,0.75)', thin='1px solid rgba(0,0,0,0.25)';
       const cell = el('div', { class:'gc queen-cell', 'data-r':r,'data-c':c, role:'gridcell', tabindex:'0',
-        'aria-label':`riga ${r+1} colonna ${c+1}`, style:{ background:QUEEN_COLORS[reg[r][c]], borderRadius:'0', color:'#fff',
+        'aria-label':`riga ${r+1} colonna ${c+1}`, style:{ borderRadius:'0', color:'#fff',
           borderTop:T?thick:thin, borderBottom:B?thick:thin, borderLeft:L?thick:thin, borderRight:R?thick:thin } });
+      cell.style.setProperty('--qc', QUEEN_COLORS[reg[r][c]]);
       grid.append(cell);
     }
     grid.addEventListener('click', e=>{ const cell=e.target.closest('.gc'); if(cell)this.tap(+cell.dataset.r,+cell.dataset.c); });
