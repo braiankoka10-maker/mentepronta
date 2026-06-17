@@ -3,222 +3,314 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-<meta name="theme-color" content="#c0392b">
-<meta name="description" content="Prenota un tavolo nella tua pizzeria preferita ad Altamura. Veloce, dal telefono.">
-<title>Pizzeria Altamura · Prenota un tavolo</title>
+<meta name="theme-color" content="#1c1410">
+<meta name="description" content="Prenota un tavolo nella nostra pizzeria ad Altamura. Eleganza pugliese, dal tuo telefono.">
+<title>Nonno Saverio · Pizzeria ad Altamura</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#fbf6ef;
-  --surface:#ffffff;
-  --ink:#2a211c;
-  --muted:#8a7d72;
-  --line:#ece1d4;
-  --brand:#c0392b;
-  --brand-dark:#962d22;
-  --accent:#e67e22;
-  --green:#2e8b57;
-  --radius:16px;
-  --shadow:0 8px 24px rgba(42,33,28,.10);
+  --bg:#14100d;
+  --bg-2:#1c1611;
+  --surface:#211a14;
+  --surface-2:#2a221b;
+  --line:rgba(214,184,140,.14);
+  --line-strong:rgba(214,184,140,.28);
+  --ink:#f4ede1;
+  --muted:#a99a85;
+  --gold:#d9b06a;
+  --gold-soft:#e8c889;
+  --terra:#c4593c;
+  --terra-soft:#d9694a;
+  --green:#5b8c5a;
+  --radius:20px;
+  --radius-sm:14px;
+  --shadow:0 18px 48px -18px rgba(0,0,0,.7);
+  --shadow-soft:0 8px 24px -12px rgba(0,0,0,.6);
+  --serif:'Cormorant Garamond',Georgia,serif;
+  --sans:'Manrope',system-ui,-apple-system,sans-serif;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;padding:0}
 body{
-  font-family:'Poppins',system-ui,-apple-system,sans-serif;
-  background:var(--bg);
+  font-family:var(--sans);
+  background:
+    radial-gradient(1200px 600px at 50% -10%, rgba(217,176,106,.10), transparent 60%),
+    radial-gradient(900px 500px at 100% 100%, rgba(196,89,60,.08), transparent 55%),
+    var(--bg);
   color:var(--ink);
-  line-height:1.45;
+  line-height:1.5;
   min-height:100dvh;
+  -webkit-font-smoothing:antialiased;
   padding-bottom:env(safe-area-inset-bottom);
 }
-.app{max-width:520px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column}
+.app{max-width:540px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column}
+::selection{background:var(--gold);color:#1c1410}
 
-/* Header */
+/* ===== Hero ===== */
 .hero{
-  background:linear-gradient(135deg,var(--brand),var(--brand-dark));
-  color:#fff;
-  padding:calc(28px + env(safe-area-inset-top)) 20px 26px;
-  border-radius:0 0 26px 26px;
   position:relative;
+  padding:calc(40px + env(safe-area-inset-top)) 26px 34px;
+  text-align:center;
   overflow:hidden;
 }
-.hero::after{
-  content:"🍕";
-  position:absolute;
-  right:-10px;bottom:-18px;
-  font-size:120px;opacity:.16;transform:rotate(-12deg);
+.hero::before{
+  content:"";position:absolute;inset:0;
+  background:
+    radial-gradient(420px 220px at 50% 0%, rgba(217,176,106,.16), transparent 70%);
+  pointer-events:none;
 }
-.hero .tag{font-size:13px;letter-spacing:.12em;text-transform:uppercase;opacity:.85;font-weight:600}
-.hero h1{margin:6px 0 4px;font-size:27px;font-weight:800;letter-spacing:-.02em}
-.hero p{margin:0;font-size:14px;opacity:.9}
+.crest{
+  width:60px;height:60px;margin:0 auto 14px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:28px;
+  background:linear-gradient(160deg, var(--surface-2), var(--surface));
+  border:1px solid var(--line-strong);
+  box-shadow:var(--shadow-soft), inset 0 1px 0 rgba(255,255,255,.04);
+}
+.eyebrow{
+  font-size:11px;letter-spacing:.42em;text-transform:uppercase;
+  color:var(--gold);font-weight:700;margin-bottom:10px;
+}
+.hero h1{
+  font-family:var(--serif);font-weight:600;
+  font-size:42px;line-height:1.02;margin:0 0 8px;letter-spacing:.01em;
+  color:var(--ink);
+}
+.hero h1 em{font-style:italic;color:var(--gold-soft)}
+.hero .sub{font-size:14px;color:var(--muted);margin:0;font-weight:500}
+.rule{display:flex;align-items:center;justify-content:center;gap:12px;margin:18px auto 0;max-width:200px}
+.rule::before,.rule::after{content:"";height:1px;flex:1;background:linear-gradient(90deg,transparent,var(--line-strong),transparent)}
+.rule span{color:var(--gold);font-size:13px}
 
-/* Tabs */
-.tabs{display:flex;gap:6px;padding:14px 16px 0}
+/* ===== Tabs ===== */
+.tabs{
+  display:flex;gap:4px;margin:6px 18px 0;padding:5px;
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:999px;box-shadow:var(--shadow-soft);
+}
 .tab{
   flex:1;border:none;background:transparent;color:var(--muted);
-  font-family:inherit;font-weight:600;font-size:14px;padding:10px 8px;
-  border-radius:12px;cursor:pointer;transition:.15s;
+  font-family:inherit;font-weight:700;font-size:13px;padding:11px 6px;
+  border-radius:999px;cursor:pointer;transition:.25s ease;letter-spacing:.01em;
 }
-.tab.active{background:var(--surface);color:var(--brand);box-shadow:var(--shadow)}
+.tab.active{
+  background:linear-gradient(160deg,var(--surface-2),var(--surface));
+  color:var(--gold-soft);box-shadow:inset 0 0 0 1px var(--line-strong);
+}
 
-main{flex:1;padding:16px;display:flex;flex-direction:column;gap:16px}
+main{flex:1;padding:18px;display:flex;flex-direction:column;gap:18px}
 
-.card{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
-.card h2{margin:0 0 14px;font-size:17px;font-weight:700}
+.card{
+  background:linear-gradient(180deg, rgba(42,34,27,.55), var(--surface));
+  border:1px solid var(--line);border-radius:var(--radius);
+  box-shadow:var(--shadow);padding:24px 22px;
+  animation:rise .5s cubic-bezier(.2,.7,.2,1) both;
+}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.card h2{
+  font-family:var(--serif);font-weight:600;font-size:26px;margin:0 0 4px;letter-spacing:.01em;
+}
+.card .lead{font-size:13px;color:var(--muted);margin:0 0 20px}
 
-label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin:0 0 6px}
-.field{margin-bottom:14px}
+label{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin:0 0 8px}
+.field{margin-bottom:20px}
 input,select,textarea{
   width:100%;font-family:inherit;font-size:16px;color:var(--ink);
-  background:var(--bg);border:1.5px solid var(--line);border-radius:12px;
-  padding:12px 14px;outline:none;transition:.15s;
+  background:var(--bg-2);border:1px solid var(--line);border-radius:var(--radius-sm);
+  padding:14px 16px;outline:none;transition:.2s;
 }
-input:focus,select:focus,textarea:focus{border-color:var(--brand);background:#fff}
-textarea{resize:vertical;min-height:64px}
+input::placeholder,textarea::placeholder{color:#6f6354}
+input:focus,select:focus,textarea:focus{
+  border-color:var(--gold);background:#1a140f;
+  box-shadow:0 0 0 4px rgba(217,176,106,.12);
+}
+textarea{resize:vertical;min-height:70px}
+input[type=date]{color-scheme:dark}
 
-/* people stepper */
-.stepper{display:flex;align-items:center;gap:14px}
+/* stepper */
+.stepper{
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--bg-2);border:1px solid var(--line);border-radius:var(--radius-sm);padding:6px;
+}
 .stepper button{
-  width:46px;height:46px;border-radius:12px;border:1.5px solid var(--line);
-  background:var(--bg);font-size:22px;font-weight:700;color:var(--brand);
-  cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center;
+  width:48px;height:48px;border-radius:11px;border:1px solid var(--line);
+  background:var(--surface-2);font-size:24px;font-weight:600;color:var(--gold-soft);
+  cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center;transition:.15s;
 }
-.stepper button:active{transform:scale(.94)}
-.stepper .count{font-size:22px;font-weight:700;min-width:40px;text-align:center}
+.stepper button:active{transform:scale(.92);background:var(--gold);color:#1c1410}
+.stepper .count{display:flex;flex-direction:column;align-items:center;line-height:1}
+.stepper .count b{font-family:var(--serif);font-size:30px;font-weight:600}
+.stepper .count small{font-size:11px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-top:2px}
 
-/* time chips */
-.chips{display:flex;flex-wrap:wrap;gap:8px}
+/* chips */
+.chips{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
 .chip{
-  border:1.5px solid var(--line);background:var(--bg);color:var(--ink);
-  font-family:inherit;font-size:15px;font-weight:600;padding:9px 14px;
-  border-radius:999px;cursor:pointer;transition:.12s;
+  border:1px solid var(--line);background:var(--bg-2);color:var(--ink);
+  font-family:inherit;font-size:15px;font-weight:600;padding:12px 4px;
+  border-radius:11px;cursor:pointer;transition:.18s;text-align:center;
 }
-.chip.active{background:var(--brand);color:#fff;border-color:var(--brand)}
-.chip:disabled{opacity:.35;cursor:not-allowed}
+.chip:hover:not(:disabled){border-color:var(--line-strong)}
+.chip.active{
+  background:linear-gradient(160deg,var(--gold-soft),var(--gold));
+  color:#1c1410;border-color:var(--gold);font-weight:700;
+  box-shadow:0 6px 18px -8px rgba(217,176,106,.6);
+}
+.chip:disabled{opacity:.3;cursor:not-allowed;text-decoration:line-through}
 
+/* buttons */
 .btn{
-  width:100%;border:none;border-radius:14px;padding:15px;
-  font-family:inherit;font-size:16px;font-weight:700;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;gap:8px;transition:.15s;
+  width:100%;border:none;border-radius:var(--radius-sm);padding:16px;
+  font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:.02em;
+  display:flex;align-items:center;justify-content:center;gap:9px;transition:.2s;
 }
-.btn-primary{background:var(--brand);color:#fff}
-.btn-primary:active{background:var(--brand-dark)}
-.btn-primary:disabled{background:#d9b3ad;cursor:not-allowed}
-.btn-wa{background:var(--green);color:#fff;margin-top:10px}
-.btn-ghost{background:transparent;color:var(--brand);border:1.5px solid var(--line)}
+.btn-primary{
+  background:linear-gradient(160deg,var(--terra-soft),var(--terra));
+  color:#fff;box-shadow:0 12px 30px -12px rgba(196,89,60,.7);
+}
+.btn-primary:active{transform:translateY(1px)}
+.btn-primary:disabled{filter:saturate(.4) opacity(.6);cursor:not-allowed}
+.btn-ghost{background:transparent;color:var(--gold-soft);border:1px solid var(--line-strong)}
+.btn-ghost:active{background:var(--surface-2)}
 
-.hint{font-size:12px;color:var(--muted);margin-top:-6px;margin-bottom:14px}
-.err{color:var(--brand);font-size:13px;font-weight:600;margin-top:8px;display:none}
+.hint{font-size:12px;color:var(--muted);margin-top:9px;display:flex;align-items:center;gap:6px}
+.err{color:var(--terra-soft);font-size:13px;font-weight:600;margin-top:14px;display:none;text-align:center}
 
-/* bookings list */
-.empty{text-align:center;color:var(--muted);padding:30px 10px}
-.empty .big{font-size:40px}
-.booking{border:1.5px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px;position:relative}
-.booking .when{font-weight:700;font-size:16px}
-.booking .meta{font-size:13px;color:var(--muted);margin-top:3px}
-.booking .pill{display:inline-block;background:#fdeee7;color:var(--accent);font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;margin-top:8px}
-.booking .actions{display:flex;gap:8px;margin-top:12px}
-.booking .actions button{flex:1;font-size:13px;padding:9px;border-radius:10px;border:1.5px solid var(--line);background:var(--bg);font-family:inherit;font-weight:600;cursor:pointer}
-.booking .actions .del{color:var(--brand)}
-.booking .actions .wa{color:var(--green)}
+/* bookings */
+.empty{text-align:center;color:var(--muted);padding:42px 10px}
+.empty .big{font-size:46px;margin-bottom:10px;filter:grayscale(.2) opacity(.8)}
+.empty p{margin:6px 0 0;font-size:14px}
+.booking{
+  border:1px solid var(--line);border-radius:var(--radius-sm);padding:18px;margin-bottom:14px;
+  background:linear-gradient(180deg, rgba(42,34,27,.4), transparent);
+  position:relative;overflow:hidden;
+}
+.booking::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(var(--gold-soft),var(--terra))}
+.booking .when{font-family:var(--serif);font-weight:600;font-size:21px}
+.booking .meta{font-size:13px;color:var(--muted);margin-top:5px}
+.booking .meta b{color:var(--ink);font-weight:600}
+.booking .pill{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(217,176,106,.12);color:var(--gold-soft);
+  font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  padding:5px 11px;border-radius:999px;margin-top:12px;border:1px solid var(--line);
+}
+.booking .actions{display:flex;gap:9px;margin-top:14px}
+.booking .actions button{
+  flex:1;font-size:13px;padding:11px;border-radius:11px;border:1px solid var(--line);
+  background:var(--bg-2);font-family:inherit;font-weight:700;cursor:pointer;transition:.15s;
+}
+.booking .actions .del{color:var(--terra-soft)}
+.booking .actions .wa{color:var(--green);border-color:rgba(91,140,90,.3)}
+.booking .actions button:active{transform:scale(.97)}
 
-/* info card */
-.info-row{display:flex;align-items:flex-start;gap:12px;padding:11px 0;border-bottom:1px solid var(--line);font-size:14px}
-.info-row:last-child{border-bottom:none}
-.info-row .ic{font-size:20px;width:26px;text-align:center}
-.info-row a{color:var(--brand);text-decoration:none;font-weight:600}
+/* info */
+.info-row{display:flex;align-items:flex-start;gap:15px;padding:15px 0;border-bottom:1px solid var(--line);font-size:14px}
+.info-row:last-of-type{border-bottom:none}
+.info-row .ic{
+  font-size:18px;width:40px;height:40px;flex:none;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--surface-2);border:1px solid var(--line);
+}
+.info-row .lab{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:2px}
+.info-row a{color:var(--gold-soft);text-decoration:none;font-weight:600}
 
 /* toast */
 .toast{
-  position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(120%);
-  background:var(--ink);color:#fff;padding:13px 20px;border-radius:999px;
-  font-size:14px;font-weight:600;box-shadow:var(--shadow);z-index:50;transition:.3s;
-  max-width:90%;text-align:center;
+  position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(160%);
+  background:linear-gradient(160deg,var(--surface-2),var(--surface));
+  color:var(--ink);padding:15px 24px;border-radius:999px;border:1px solid var(--line-strong);
+  font-size:14px;font-weight:700;box-shadow:var(--shadow);z-index:50;
+  transition:transform .45s cubic-bezier(.2,.9,.2,1);max-width:90%;text-align:center;
 }
 .toast.show{transform:translateX(-50%) translateY(0)}
 
-footer{text-align:center;font-size:12px;color:var(--muted);padding:18px}
+footer{text-align:center;font-size:11px;color:var(--muted);padding:24px;letter-spacing:.04em}
+footer .dot{color:var(--gold);margin:0 6px}
 .hidden{display:none}
 </style>
 </head>
 <body>
 <div class="app">
   <header class="hero">
-    <div class="tag">Altamura · Puglia</div>
-    <h1>Pizzeria da Nonno Saverio</h1>
-    <p>Prenota il tuo tavolo in pochi secondi 🍕</p>
+    <div class="crest">🍕</div>
+    <div class="eyebrow">Altamura · Puglia</div>
+    <h1>Nonno <em>Saverio</em></h1>
+    <p class="sub">Forno a legna dal 1962</p>
+    <div class="rule"><span>✦</span></div>
   </header>
 
-  <div class="tabs">
+  <nav class="tabs">
     <button class="tab active" data-tab="prenota">Prenota</button>
-    <button class="tab" data-tab="mie">Le mie prenotazioni</button>
-    <button class="tab" data-tab="info">Info</button>
-  </div>
+    <button class="tab" data-tab="mie">I miei tavoli</button>
+    <button class="tab" data-tab="info">Contatti</button>
+  </nav>
 
   <main>
-    <!-- ===== PRENOTA ===== -->
+    <!-- PRENOTA -->
     <section id="tab-prenota" class="card">
-      <h2>Nuova prenotazione</h2>
+      <h2>Riserva il tuo tavolo</h2>
+      <p class="lead">Bastano pochi istanti. Ti aspettiamo sotto il nostro forno a legna.</p>
 
       <div class="field">
-        <label for="nome">Nome</label>
-        <input id="nome" type="text" placeholder="Es. Mario Rossi" autocomplete="name">
+        <label for="nome">A nome di</label>
+        <input id="nome" type="text" placeholder="Mario Rossi" autocomplete="name">
       </div>
 
       <div class="field">
         <label for="tel">Telefono</label>
-        <input id="tel" type="tel" placeholder="Es. 333 1234567" autocomplete="tel" inputmode="tel">
+        <input id="tel" type="tel" placeholder="333 123 4567" autocomplete="tel" inputmode="tel">
       </div>
 
       <div class="field">
-        <label for="data">Giorno</label>
+        <label for="data">Quando</label>
         <input id="data" type="date">
-        <div class="hint" id="data-hint">Chiuso il lunedì.</div>
+        <div class="hint" id="data-hint">✦ Aperti dal martedì alla domenica.</div>
       </div>
 
       <div class="field">
-        <label>Persone</label>
+        <label>Quanti siete</label>
         <div class="stepper">
           <button type="button" id="meno" aria-label="Meno persone">−</button>
-          <span class="count" id="persone">2</span>
+          <span class="count"><b id="persone">2</b><small>persone</small></span>
           <button type="button" id="piu" aria-label="Più persone">+</button>
         </div>
       </div>
 
       <div class="field">
-        <label>Orario</label>
+        <label>A che ora</label>
         <div class="chips" id="orari"></div>
       </div>
 
       <div class="field">
-        <label for="note">Note (opzionale)</label>
+        <label for="note">Richieste particolari</label>
         <textarea id="note" placeholder="Allergie, seggiolone, tavolo all'aperto…"></textarea>
       </div>
 
-      <button class="btn btn-primary" id="conferma">✓ Conferma prenotazione</button>
+      <button class="btn btn-primary" id="conferma">Conferma prenotazione</button>
       <div class="err" id="err"></div>
     </section>
 
-    <!-- ===== LE MIE ===== -->
+    <!-- LE MIE -->
     <section id="tab-mie" class="card hidden">
-      <h2>Le mie prenotazioni</h2>
+      <h2>I miei tavoli</h2>
+      <p class="lead">Le tue prenotazioni salvate su questo telefono.</p>
       <div id="lista"></div>
     </section>
 
-    <!-- ===== INFO ===== -->
+    <!-- INFO -->
     <section id="tab-info" class="card hidden">
-      <h2>Dove siamo</h2>
-      <div class="info-row"><span class="ic">📍</span><div>Via Federico II di Svevia, 12<br>70022 Altamura (BA)</div></div>
-      <div class="info-row"><span class="ic">📞</span><div><a href="tel:+390803111222">080 311 1222</a></div></div>
-      <div class="info-row"><span class="ic">🕒</span><div>Mar–Dom: 19:00 – 23:30<br>Lunedì chiuso</div></div>
-      <div class="info-row"><span class="ic">🗺️</span><div><a href="https://maps.google.com/?q=Altamura+pizzeria" target="_blank" rel="noopener">Apri in Google Maps</a></div></div>
-      <button class="btn btn-ghost" style="margin-top:14px" onclick="window.location.href='tel:+390803111222'">📞 Chiama la pizzeria</button>
+      <h2>Vieni a trovarci</h2>
+      <p class="lead">Nel cuore del centro storico di Altamura.</p>
+      <div class="info-row"><span class="ic">📍</span><div><div class="lab">Indirizzo</div>Via Federico II di Svevia, 12 — 70022 Altamura (BA)</div></div>
+      <div class="info-row"><span class="ic">📞</span><div><div class="lab">Telefono</div><a href="tel:+390803111222">080 311 1222</a></div></div>
+      <div class="info-row"><span class="ic">🕒</span><div><div class="lab">Orari</div>Mar – Dom · 19:00 – 23:30<br>Lunedì chiuso</div></div>
+      <div class="info-row"><span class="ic">🗺️</span><div><div class="lab">Mappa</div><a href="https://maps.google.com/?q=Altamura+pizzeria" target="_blank" rel="noopener">Apri in Google Maps</a></div></div>
+      <button class="btn btn-ghost" style="margin-top:18px" onclick="window.location.href='tel:+390803111222'">📞 Chiama ora</button>
     </section>
   </main>
 
-  <footer>Made with 🍕 ad Altamura · Le prenotazioni restano salvate sul tuo telefono</footer>
+  <footer>Nonno Saverio <span class="dot">✦</span> Altamura <span class="dot">✦</span> Forno a legna</footer>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -226,8 +318,7 @@ footer{text-align:center;font-size:12px;color:var(--muted);padding:18px}
 <script>
 (function(){
   "use strict";
-  // Numero WhatsApp della pizzeria (formato internazionale, senza + né spazi)
-  var WA_NUMERO = "390803111222";
+  var WA_NUMERO = "390803111222"; // numero WhatsApp pizzeria (formato internazionale)
   var SLOT = ["19:00","19:30","20:00","20:30","21:00","21:30","22:00","22:30"];
   var MAX_PERSONE = 20, MIN_PERSONE = 1;
   var KEY = "prenotazioni_pizzeria_altamura";
@@ -235,7 +326,7 @@ footer{text-align:center;font-size:12px;color:var(--muted);padding:18px}
   var $ = function(id){ return document.getElementById(id); };
   var persone = 2, orarioSel = "";
 
-  /* ---- Tabs ---- */
+  /* Tabs */
   document.querySelectorAll(".tab").forEach(function(t){
     t.addEventListener("click", function(){
       document.querySelectorAll(".tab").forEach(function(x){ x.classList.remove("active"); });
@@ -244,171 +335,147 @@ footer{text-align:center;font-size:12px;color:var(--muted);padding:18px}
         $("tab-"+name).classList.toggle("hidden", name !== t.dataset.tab);
       });
       if(t.dataset.tab === "mie") render();
+      var vis = document.querySelector("#tab-"+t.dataset.tab);
+      if(vis){ vis.style.animation="none"; void vis.offsetWidth; vis.style.animation=""; }
     });
   });
 
-  /* ---- Toast ---- */
+  /* Toast */
   var toastTimer;
   function toast(msg){
-    var el = $("toast");
-    el.textContent = msg;
-    el.classList.add("show");
+    var el = $("toast"); el.textContent = msg; el.classList.add("show");
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(function(){ el.classList.remove("show"); }, 2600);
+    toastTimer = setTimeout(function(){ el.classList.remove("show"); }, 2800);
   }
 
-  /* ---- Data: default oggi (o domani se lunedì), min oggi ---- */
+  /* Data */
   function ymd(d){ return d.toISOString().slice(0,10); }
   var oggi = new Date(); oggi.setHours(0,0,0,0);
   var def = new Date(oggi);
-  if(def.getDay() === 1) def.setDate(def.getDate()+1); // salta lunedì
+  if(def.getDay() === 1) def.setDate(def.getDate()+1);
   $("data").min = ymd(oggi);
   $("data").value = ymd(def);
 
   function isLunedi(value){
     if(!value) return false;
-    var d = new Date(value + "T12:00:00");
-    return d.getDay() === 1;
+    return new Date(value + "T12:00:00").getDay() === 1;
   }
   $("data").addEventListener("change", function(){
-    $("data-hint").textContent = isLunedi(this.value)
-      ? "⚠️ Lunedì siamo chiusi, scegli un altro giorno."
-      : "Chiuso il lunedì.";
-    $("data-hint").style.color = isLunedi(this.value) ? "var(--brand)" : "var(--muted)";
+    var lun = isLunedi(this.value);
+    $("data-hint").textContent = lun ? "⚠ Lunedì siamo chiusi: scegli un altro giorno." : "✦ Aperti dal martedì alla domenica.";
+    $("data-hint").style.color = lun ? "var(--terra-soft)" : "var(--muted)";
     refreshSlots();
   });
 
-  /* ---- Stepper persone ---- */
+  /* Stepper */
   $("piu").addEventListener("click", function(){ if(persone<MAX_PERSONE){persone++; $("persone").textContent=persone;} });
   $("meno").addEventListener("click", function(){ if(persone>MIN_PERSONE){persone--; $("persone").textContent=persone;} });
 
-  /* ---- Slot orari ---- */
+  /* Slot */
   function buildSlots(){
-    var box = $("orari");
-    box.innerHTML = "";
+    var box = $("orari"); box.innerHTML = "";
     SLOT.forEach(function(o){
       var b = document.createElement("button");
-      b.type = "button"; b.className = "chip"; b.textContent = o; b.dataset.ora = o;
+      b.type="button"; b.className="chip"; b.textContent=o; b.dataset.ora=o;
       b.addEventListener("click", function(){
         if(b.disabled) return;
-        orarioSel = o;
+        orarioSel=o;
         box.querySelectorAll(".chip").forEach(function(c){ c.classList.remove("active"); });
         b.classList.add("active");
       });
       box.appendChild(b);
     });
   }
-  // Se il giorno scelto è oggi, disabilita gli slot già passati
   function refreshSlots(){
-    var val = $("data").value;
-    var now = new Date();
-    var oggiStr = ymd(new Date(now.getFullYear(), now.getMonth(), now.getDate()));
+    var val=$("data").value, now=new Date();
+    var oggiStr=ymd(new Date(now.getFullYear(),now.getMonth(),now.getDate()));
+    var hhmm=("0"+now.getHours()).slice(-2)+":"+("0"+now.getMinutes()).slice(-2);
     $("orari").querySelectorAll(".chip").forEach(function(c){
-      var passato = (val === oggiStr) && (c.dataset.ora <= (("0"+now.getHours()).slice(-2)+":"+("0"+now.getMinutes()).slice(-2)));
-      c.disabled = passato;
+      var passato=(val===oggiStr)&&(c.dataset.ora<=hhmm);
+      c.disabled=passato;
       if(passato && c.classList.contains("active")){ c.classList.remove("active"); orarioSel=""; }
     });
   }
   buildSlots(); refreshSlots();
 
-  /* ---- Storage ---- */
-  function load(){
-    try{ return JSON.parse(localStorage.getItem(KEY)) || []; }catch(e){ return []; }
-  }
+  /* Storage */
+  function load(){ try{ return JSON.parse(localStorage.getItem(KEY))||[]; }catch(e){ return []; } }
   function save(arr){ localStorage.setItem(KEY, JSON.stringify(arr)); }
 
-  /* ---- Formattazione ---- */
-  var GIORNI = ["Domenica","Lunedì","Martedì","Mercoledì","Giovedì","Venerdì","Sabato"];
-  var MESI = ["gen","feb","mar","apr","mag","giu","lug","ago","set","ott","nov","dic"];
+  /* Format */
+  var GIORNI=["Domenica","Lunedì","Martedì","Mercoledì","Giovedì","Venerdì","Sabato"];
+  var MESI=["gennaio","febbraio","marzo","aprile","maggio","giugno","luglio","agosto","settembre","ottobre","novembre","dicembre"];
   function dataLeggibile(value){
-    var d = new Date(value + "T12:00:00");
-    return GIORNI[d.getDay()] + " " + d.getDate() + " " + MESI[d.getMonth()];
+    var d=new Date(value+"T12:00:00");
+    return GIORNI[d.getDay()]+" "+d.getDate()+" "+MESI[d.getMonth()];
   }
 
   function messaggioWA(p){
-    return "Ciao! Vorrei prenotare un tavolo:%0A" +
-      "👤 " + encodeURIComponent(p.nome) + "%0A" +
-      "👥 " + p.persone + " persone%0A" +
-      "📅 " + encodeURIComponent(dataLeggibile(p.data)) + "%0A" +
-      "🕒 " + p.orario + "%0A" +
-      "📞 " + encodeURIComponent(p.tel) +
-      (p.note ? "%0A📝 " + encodeURIComponent(p.note) : "");
+    return "Buongiorno! Vorrei prenotare un tavolo da Nonno Saverio:%0A%0A"+
+      "👤 "+encodeURIComponent(p.nome)+"%0A"+
+      "👥 "+p.persone+" persone%0A"+
+      "📅 "+encodeURIComponent(dataLeggibile(p.data))+"%0A"+
+      "🕒 "+p.orario+"%0A"+
+      "📞 "+encodeURIComponent(p.tel)+
+      (p.note ? "%0A📝 "+encodeURIComponent(p.note) : "");
   }
-  function apriWA(p){
-    window.open("https://wa.me/" + WA_NUMERO + "?text=" + messaggioWA(p), "_blank");
-  }
+  function apriWA(p){ window.open("https://wa.me/"+WA_NUMERO+"?text="+messaggioWA(p), "_blank"); }
 
-  /* ---- Conferma ---- */
+  /* Conferma */
   $("conferma").addEventListener("click", function(){
-    var nome = $("nome").value.trim();
-    var tel = $("tel").value.trim();
-    var data = $("data").value;
-    var err = $("err");
-    err.style.display = "none";
-
-    function fail(msg){ err.textContent = msg; err.style.display = "block"; }
-
-    if(nome.length < 2) return fail("Inserisci il tuo nome.");
-    if(tel.replace(/\D/g,"").length < 6) return fail("Inserisci un numero di telefono valido.");
+    var nome=$("nome").value.trim(), tel=$("tel").value.trim(), data=$("data").value, err=$("err");
+    err.style.display="none";
+    function fail(m){ err.textContent=m; err.style.display="block"; }
+    if(nome.length<2) return fail("Inserisci il tuo nome.");
+    if(tel.replace(/\D/g,"").length<6) return fail("Inserisci un numero di telefono valido.");
     if(!data) return fail("Scegli un giorno.");
     if(isLunedi(data)) return fail("Il lunedì siamo chiusi: scegli un altro giorno.");
     if(!orarioSel) return fail("Scegli un orario.");
 
-    var p = {
-      id: Date.now(),
-      nome: nome, tel: tel, data: data,
-      orario: orarioSel, persone: persone,
-      note: $("note").value.trim()
-    };
-    var arr = load(); arr.push(p); save(arr);
+    var p={ id:Date.now(), nome:nome, tel:tel, data:data, orario:orarioSel, persone:persone, note:$("note").value.trim() };
+    var arr=load(); arr.push(p); save(arr);
 
-    toast("Prenotazione salvata! 🎉");
-    // Reset leggero
-    orarioSel = "";
-    $("note").value = "";
+    toast("Tavolo riservato ✦");
+    orarioSel=""; $("note").value="";
     $("orari").querySelectorAll(".chip").forEach(function(c){ c.classList.remove("active"); });
 
-    // Chiedi conferma invio WhatsApp
-    if(confirm("Prenotazione salvata!\n\nVuoi inviarla anche via WhatsApp alla pizzeria per confermare?")){
+    if(confirm("Tavolo riservato!\n\nVuoi inviare la prenotazione via WhatsApp alla pizzeria per confermarla?")){
       apriWA(p);
     }
   });
 
-  /* ---- Render lista ---- */
+  /* Render */
   function render(){
-    var lista = $("lista");
-    var arr = load().sort(function(a,b){
-      return (a.data+a.orario) > (b.data+b.orario) ? 1 : -1;
-    });
-    if(arr.length === 0){
-      lista.innerHTML = '<div class="empty"><div class="big">🗓️</div>Nessuna prenotazione.<br>Prenota dalla scheda “Prenota”.</div>';
+    var lista=$("lista");
+    var arr=load().sort(function(a,b){ return (a.data+a.orario)>(b.data+b.orario)?1:-1; });
+    if(arr.length===0){
+      lista.innerHTML='<div class="empty"><div class="big">🕯️</div><p>Ancora nessun tavolo riservato.</p><p>Prenota dalla scheda “Prenota”.</p></div>';
       return;
     }
-    lista.innerHTML = "";
+    lista.innerHTML="";
     arr.forEach(function(p){
-      var div = document.createElement("div");
-      div.className = "booking";
-      div.innerHTML =
-        '<div class="when">📅 ' + dataLeggibile(p.data) + ' · 🕒 ' + p.orario + '</div>' +
-        '<div class="meta">' + escapeHtml(p.nome) + ' · 👥 ' + p.persone + ' persone · 📞 ' + escapeHtml(p.tel) + '</div>' +
-        (p.note ? '<div class="meta">📝 ' + escapeHtml(p.note) + '</div>' : '') +
-        '<span class="pill">In attesa di conferma</span>' +
-        '<div class="actions">' +
-          '<button class="wa" data-wa="'+p.id+'">WhatsApp</button>' +
-          '<button class="del" data-del="'+p.id+'">Elimina</button>' +
+      var div=document.createElement("div"); div.className="booking";
+      div.innerHTML=
+        '<div class="when">'+dataLeggibile(p.data)+' · '+p.orario+'</div>'+
+        '<div class="meta"><b>'+escapeHtml(p.nome)+'</b> · '+p.persone+' persone · '+escapeHtml(p.tel)+'</div>'+
+        (p.note ? '<div class="meta">📝 '+escapeHtml(p.note)+'</div>' : '')+
+        '<span class="pill">✦ In attesa di conferma</span>'+
+        '<div class="actions">'+
+          '<button class="wa" data-wa="'+p.id+'">Invia su WhatsApp</button>'+
+          '<button class="del" data-del="'+p.id+'">Elimina</button>'+
         '</div>';
       lista.appendChild(div);
     });
     lista.querySelectorAll("[data-del]").forEach(function(b){
       b.addEventListener("click", function(){
         if(!confirm("Eliminare questa prenotazione?")) return;
-        save(load().filter(function(x){ return x.id != b.dataset.del; }));
+        save(load().filter(function(x){ return x.id!=b.dataset.del; }));
         render(); toast("Prenotazione eliminata");
       });
     });
     lista.querySelectorAll("[data-wa]").forEach(function(b){
       b.addEventListener("click", function(){
-        var p = load().filter(function(x){ return x.id == b.dataset.wa; })[0];
+        var p=load().filter(function(x){ return x.id==b.dataset.wa; })[0];
         if(p) apriWA(p);
       });
     });
